@@ -25,22 +25,24 @@ grunt.initConfig({
     sfc: {
         your_target: {
             src: ['...'],
-            // optional extensions (if `dst` does not contain file name), 
-            // defaults are the following:
-            exts: {
-                template: 'html',
-                script: 'js',
-                style: 'css'		
-            }
-            processors: {
-                pug: require('pug').render,
-                js: function(content){
-                    // do something with the content
-                    return content;
-                },
-                .
-                .
-                .
+            options: {
+                // optional extensions (if `dst` does not contain file name), 
+                // defaults are the following:
+                exts: {
+                    template: 'html',
+                    script: 'js',
+                    style: 'css'		
+                }
+                processors: {
+                    pug: require('pug').render,
+                    js: function(content){
+                        // do something with the content
+                        return content;
+                    },
+                    .
+                    .
+                    .
+                }
             }
         }
     }
