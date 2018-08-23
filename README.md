@@ -17,9 +17,7 @@ One the plugin has been installed, it may be enabled inside your Gruntfile with 
 grunt.loadNpmTasks('grunt-single-file-component');
 ```
 
-## The "sfc" task
-
-### Usage Examples
+## Usage Example
 In your project's Gruntfile, add a section named `sfc` to the data object passed into `grunt.initConfig()`.
 
 ```js
