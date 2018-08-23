@@ -24,12 +24,12 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
         // (az utana levoket pedig figyelmen kivul hagyja az ertelmezo).
         //
 
-        const wrap = '<data>' +  fs.readFileSync(filePath) + '</data>';
-        parse(wrap, {async: false, strict: false, normalizeTags: true, attrkey: '$$attrs', charkey: '$$text'}, (err, xml) => {
+        const wrap = '<data>' + fs.readFileSync(filePath).toString().replace(/&/g, '&amp;') + '</data>';
+        parse(wrap, {async: false, normalizeTags: true, explicitRoot: false, attrkey: '$$attrs', charkey: '$$text'}, (err, xml) => {
             if (err) throw err;
             var processed = 0;
 
-            Object.keys(xml.data)
+            Object.keys(xml)
                 //
                 // Ugyanazzal a nevvel adott szinten tobb node is lehet ezert ertelmezes
                 // utan "nodeName: [{...}, {...}]" formaban lesznek az oljektum
@@ -49,9 +49,7 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
                     // pl.: template -> .html (Object.assign())
                     //
 
-                    ar.push(...xml
-                        .data[curr]
-                        .map(x => Object.assign({$$ext: exts[curr]}, x)));
+                    ar.push(...xml[curr].map(x => Object.assign({$$ext: exts[curr]}, x)));
 
                     return ar;
                 }, [])
