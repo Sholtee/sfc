@@ -25,7 +25,7 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
         //
 
         const wrap = '<data>' +  fs.readFileSync(filePath) + '</data>';
-        parse(wrap, {async: false, attrkey: '$$attrs', charkey: '$$text'}, (err, xml) => {
+        parse(wrap, {async: false, strict: false, normalizeTags: true, attrkey: '$$attrs', charkey: '$$text'}, (err, xml) => {
             if (err) throw err;
             var processed = 0;
 
