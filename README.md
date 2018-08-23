@@ -1,4 +1,4 @@
-# grunt-simple-file-component
+# grunt-single-file-component
 
 > A small grunt task which let you keep all the assets of your component in a (custom) single file
 
@@ -24,26 +24,28 @@ In your project's Gruntfile, add a section named `sfc` to the data object passed
 
 ```js
 grunt.initConfig({
-  sfc: {
-    your_target: {
-	  src: ['...'],
-	  exts: {   // optional extensions (if `dst` does not contain file name), defaults are the following:
-	    template: 'html',
-		script: 'js',
-        style: 'css'		
-	  }
-      processors: {
-        pug: require('pug').render,
-		js: function(content){
-		    // do something with the content
-			return content;
-		},
-		.
-		.
-		.
-      }
-    },
-  },
+    sfc: {
+        your_target: {
+            src: ['...'],
+            // optional extensions (if `dst` does not contain file name), 
+            // defaults are the following:
+            exts: {
+                template: 'html',
+                script: 'js',
+                style: 'css'		
+            }
+            processors: {
+                pug: require('pug').render,
+                js: function(content){
+                    // do something with the content
+                    return content;
+                },
+                .
+                .
+                .
+            }
+        }
+    }
 })
 ```
 
