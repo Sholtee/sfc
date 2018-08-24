@@ -114,11 +114,11 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
                 }));
             }
 
+			return sanitized;
+
             function escape(str, chars){
                 return str.replace(new RegExp('(' + Object.keys(chars).join('|') + ')', 'g'), (match, char) => chars[char]);
             }
-
-            return sanitized;
         }
     }));
 });
