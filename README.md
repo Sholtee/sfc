@@ -32,7 +32,7 @@ grunt.initConfig({
                     template: 'html',
                     script: 'js',
                     style: 'css'		
-                }
+                },
                 processors: {
                     pug: require('pug').render,
                     js: function(content){
