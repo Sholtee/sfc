@@ -89,33 +89,14 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
         });
 
         function sanitizeInput(input){
-            var sanitized = '';
-
-            //
-            // Egy melysegben match-elunk a node-okra es azok tartalmara (megjegyzem
-            // h ez a regex a commenteket [<!-- -->] kihagyja).
-            //
-
-            for(var ar, regex = /<(\w+)\b.*>([\s\S]*)<\/\1>/g; (ar = regex.exec(input)) != null;){
-                const
-                    match   = ar[0],
-                    content = ar[2];
-
-                //
-                // Tartalomban escape-elunk.
-                //
-
-                sanitized += match.replace(content, escape(content, {
-                    '"': '&quot;',
-                    "'": '&apos;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '&': '&amp;'
-                }));
-            }
-
-			return sanitized;
-
+            return input.replace(/(<(\w+)\b.*>([\s\S]*)<\/\2>)/g, (_void, match, elem, content) => match.replace(content, escape(content, {
+                '"': '&quot;',
+                "'": '&apos;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '&': '&amp;'
+            })));
+            
             function escape(str, chars){
                 return str.replace(new RegExp('(' + Object.keys(chars).join('|') + ')', 'g'), (match, char) => chars[char]);
             }
