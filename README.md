@@ -55,6 +55,7 @@ grunt.initConfig({
 .foo
   .bar XxX
 </template>
+
 <script processor="js" dst="<%= project.dirs.dist %>/scripts/logic.js">
 console.log('kerekesfacapa');
 </script>
