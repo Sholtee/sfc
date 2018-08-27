@@ -18,16 +18,16 @@ grunt.loadNpmTasks('grunt-single-file-component');
 ```
 
 ## Usage Example
-In your project's Gruntfile, add a section named `sfc` to the data object passed into `grunt.initConfig()`.
+In your project's Gruntfile, add a section named `sfc` to the data object passed into `grunt.initConfig()`:
 
 ```js
 grunt.initConfig({
     sfc: {
         your_target: {
-            src: ['...'],
+            src: ['dummy.component'],
             options: {
-                // optional extensions (if `dst` does not contain file name), 
-                // defaults are the following:
+                // optional extensions (if "dst" does not contain file name), 
+                // defaults to:
                 exts: {
                     template: 'html',
                     script: 'js',
@@ -49,13 +49,16 @@ grunt.initConfig({
 })
 ```
 
+`dummy.component`:
+
 ```sfc
-<!-- The output file name will be "name_of_this_file.html" -->
+<!-- The output file will be named "dummy.html" -->
 <template processor="pug" dst="<%= project.dirs.dist %>/views/">
 .foo
   .bar XxX
 </template>
 
+<!-- The output file will be named "logic.js" -->
 <script processor="js" dst="<%= project.dirs.dist %>/scripts/logic.js">
 console.log('kerekesfacapa');
 </script>
@@ -66,3 +69,4 @@ console.log('kerekesfacapa');
 
 ## Release History
 0.0.1: Initial release
+0.0.2: Fixed file naming issue

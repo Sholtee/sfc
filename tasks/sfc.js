@@ -61,10 +61,14 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
                     // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
                     // nevet es a fentebb megallapitott kiterjesztest kapja.
                     //
+                    // Megjegyzes:
+                    //    NE a grunt.file.isFile()-t hasznaljuk mert az nem letezo utvonalnal
+                    //    mindig hamissal ter vissza.
+                    //
                     
                     var dst = grunt.template.process(data.$$attrs.dst);
 
-                    if (!grunt.file.isFile(dst)) dst = path.format({
+                    if (!path.parse(dst).ext) dst = path.format({
                         dir:  dst,
                         name: path.basename(filePath, path.extname(filePath)),
                         ext:  data.$$ext
