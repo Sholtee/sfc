@@ -25,7 +25,7 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
         //
 
         const wrap = '<data>' + sanitizeInput(fs.readFileSync(filePath).toString()) + '</data>';
-        parse(wrap, {async: false, normalizeTags: true, explicitRoot: false, attrkey: '$$attrs', charkey: '$$text'}, (err, xml) => {
+        parse(wrap, {async: false, normalizeTags: true, explicitRoot: false, attrkey: '$$attrs', charkey: '$$content'}, (err, xml) => {
             if (err) throw err;
             var processed = 0;
 
@@ -53,7 +53,10 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
 
                     return ar;
                 }, [])
-                .map(data => {
+                .forEach(data => {
+                    const process = options.processors[data.$$attrs.processor];
+                    if (!process) return;
+
                     //
                     // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
                     // nevet es a fentebb megallapitott kiterjesztest kapja.
@@ -65,23 +68,14 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
                         dst = path.join(dst, path.basename(filePath, path.extname(filePath)) + data.$$ext);
                     }
 
-                    return {
-                        processor: data.$$attrs.processor,
-                        dst:       dst,
-                        content:   data.$$text
-                    };
-                })
-                .forEach(data => {
-                    if (!data.processor) return;
-
                     //
                     // A csomopont tartalmat atadjuk a megfelelo feldolgozonak a kimenetet pedig
                     // a "dst" attributumban megadott fajlba irjuk.
                     //
                     // TODO: file extending support
                     //
-                    
-                    grunt.file.write(data.dst, options.processors[data.processor](data.content));
+
+                    grunt.file.write(dst, process(data.$$content));
                     processed++;
                 });
 
