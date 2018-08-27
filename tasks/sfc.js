@@ -66,7 +66,7 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
 
                     if (!grunt.file.isFile(dst)) dst = path.format({
                         dir:  dst,
-                        file: path.basename(filePath, path.extname(filePath)),
+                        name: path.basename(filePath, path.extname(filePath)),
                         ext:  data.$$ext
                     });
 
