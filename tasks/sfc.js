@@ -64,9 +64,11 @@ module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component'
                     
                     var dst = grunt.template.process(data.$$attrs.dst);
 
-                    if (!grunt.file.isFile(dst)) {
-                        dst = path.join(dst, path.basename(filePath, path.extname(filePath)) + data.$$ext);
-                    }
+                    if (!grunt.file.isFile(dst)) dst = path.format({
+                        dir:  dst,
+                        file: path.basename(filePath, path.extname(filePath)),
+                        ext:  data.$$ext
+                    });
 
                     //
                     // A csomopont tartalmat atadjuk a megfelelo feldolgozonak a kimenetet pedig
