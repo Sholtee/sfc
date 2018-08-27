@@ -2,7 +2,7 @@
   "name": "grunt-single-file-component",
   "description": "Grunt Single File Component",
   "version": "0.0.1",
-  "private": true,
+  "license": "MIT",
   "contributors": [{
     "name": "Denes Solti",
     "email": "sodnaatx@gmail.com"
