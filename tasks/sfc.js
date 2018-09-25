@@ -2,104 +2,89 @@
 *  sfc.js                                                                       *
 *  Author: Denes Solti                                                          *
 ********************************************************************************/
+(function(){
 'use strict';
 
-module.exports = grunt => grunt.registerMultiTask('sfc', 'Single File Component', function(){
-    const
-        options = this.data.options,
-        fs      = require('fs'),
-        path    = require('path'),
-        parse   = require('xml2js').parseString;
+const
+    fs   = require('fs'),
+    path = require('path');
 
-    //
-    // Vegig a keresesi felteteleknek megfelelo fajlokon. "src"-ben lehet tobb
-    // feltetel is -> forEach().
-    //
+module.exports = sfc;
 
-    this.data.src.forEach(src => grunt.file.expand({filter: 'isFile'}, src).forEach(filePath => {
+function sfc(grunt){
+    grunt.registerMultiTask('sfc', 'Single File Component', function(){
+        sfc.$transpile(grunt, this.data.src, this.data.options);
+    });
+}
+
+sfc.$transpile = function(grunt, src, options){
+    const exts = options.exts || {
+        template: '.html',
+        script:   '.js',
+        style:    '.css'
+    };
+
+    src.forEach(src => grunt.file.expand({filter: 'isFile'}, src).forEach(filePath => {
         grunt.log.write('Processing file "' + filePath + '": ');
+        var processed = 0;
 
-        //
-        // Csomagolas nelkul -tobb node eseten- az elso gyerek lesz a gyoker
-        // (az utana levoket pedig figyelmen kivul hagyja az ertelmezo).
-        //
+        this.$parseNodes(fs.readFileSync(filePath).toString()).forEach(node => {
+            const process = options.processors[node.attrs.processor];
+            if (!process) return;
 
-        const wrap = '<data>' + sanitizeInput(fs.readFileSync(filePath).toString()) + '</data>';
-        parse(wrap, {async: false, normalizeTags: true, explicitRoot: false, attrkey: '$$attrs', charkey: '$$content'}, (err, xml) => {
-            if (err) throw err;
-            var processed = 0;
+            //
+            // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
+            // nevet es az "exts" szerinti kiterjesztest kapja.
+            //
+            // Megjegyzes:
+            //    NE a grunt.file.isFile()-t hasznaljuk mert az nem letezo utvonalnal
+            //    mindig hamissal ter vissza.
+            //
 
-            Object.keys(xml)
-                //
-                // Ugyanazzal a nevvel adott szinten tobb node is lehet ezert ertelmezes
-                // utan "nodeName: [{...}, {...}]" formaban lesznek az oljektum
-                // property-ei.
-                //
+            var dst = grunt.template.process(node.attrs.dst);
 
-                .reduce((ar, curr) => {
-                    const exts = options.exts || {
-                        template: '.html',
-                        script:   '.js',
-                        style:    '.css'
-                    };
+            if (!path.parse(dst).ext) dst = path.format({
+                dir:  dst,
+                name: path.basename(filePath, path.extname(filePath)),
+                ext:  exts[node.name.toLowerCase()]
+            });
+            
+            //
+            // TODO: file extending support
+            //
 
-                    //
-                    // Minket csak az elso szinten levo csomopontok erdekelnek -> selectMany().
-                    // Ugyanitt a node nevebol meg a kiterjesztest is meg tudjuk allapitani
-                    // pl.: template -> .html (Object.assign())
-                    //
+            grunt.file.write(dst, process(node.content));
 
-                    ar.push(...xml[curr].map(x => Object.assign({$$ext: exts[curr]}, x)));
-
-                    return ar;
-                }, [])
-                .forEach(data => {
-                    const process = options.processors[data.$$attrs.processor];
-                    if (!process) return;
-
-                    //
-                    // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
-                    // nevet es a fentebb megallapitott kiterjesztest kapja.
-                    //
-                    // Megjegyzes:
-                    //    NE a grunt.file.isFile()-t hasznaljuk mert az nem letezo utvonalnal
-                    //    mindig hamissal ter vissza.
-                    //
-                    
-                    var dst = grunt.template.process(data.$$attrs.dst);
-
-                    if (!path.parse(dst).ext) dst = path.format({
-                        dir:  dst,
-                        name: path.basename(filePath, path.extname(filePath)),
-                        ext:  data.$$ext
-                    });
-
-                    //
-                    // A csomopont tartalmat atadjuk a megfelelo feldolgozonak a kimenetet pedig
-                    // a "dst" attributumban megadott fajlba irjuk.
-                    //
-                    // TODO: file extending support
-                    //
-
-                    grunt.file.write(dst, process(data.$$content));
-                    processed++;
-                });
-
-            grunt.log.writeln(processed + ' file(s) created');
+            processed++;
         });
 
-        function sanitizeInput(input){
-            return input.replace(/(<(\w+)\b.*>([\s\S]*)<\/\2>)/g, (_void, match, elem, content) => match.replace(content, escape(content, {
-                '"': '&quot;',
-                "'": '&apos;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '&': '&amp;'
-            })));
-            
-            function escape(str, chars){
-                return str.replace(new RegExp('(' + Object.keys(chars).join('|') + ')', 'g'), (match, char) => chars[char]);
-            }
-        }
+        grunt.log.writeln(processed + ' file(s) created');
     }));
-});
+};
+
+sfc.$parseAttributes = function(input){
+    const
+        rex = /(\S+)(?:=("|')((?:(?!\2|\n).)*)\2)/g,
+        res = {};
+
+    for(var ar; (ar = rex.exec(input)) != null;){
+        res[ar[1]] = ar[3];
+    }
+
+    return res;
+};
+
+sfc.$parseNodes = function(input){
+    const
+        rex = /<(\w+)\b((?:\s*\S+(?:=("|')((?:(?!\3|\n).)*)\3))*)(?:(?!>).)*>([\s\S]*)<\/\1>$/gm,
+        res = [];
+
+    for(var ar; (ar = rex.exec(input)) != null;) res.push({
+        name:    ar[1],
+        attrs:   this.$parseAttributes(ar[2]),
+        content: ar[5]
+    });
+
+    return res;
+};
+})();

@@ -3,15 +3,16 @@
   "description": "Grunt Single File Component",
   "version": "0.0.2",
   "license": "MIT",
-  "contributors": [{
-    "name": "Denes Solti",
-    "email": "sodnaatx@gmail.com"
-  }],
-  "dependencies": {
-    "xml2js": "^0.4.19"
-  },
+  "contributors": [
+    {
+      "name": "Denes Solti",
+      "email": "sodnaatx@gmail.com"
+    }
+  ],
+  "dependencies": {},
   "devDependencies": {
-    "grunt": "^1.0.2"
+    "grunt": "^1.0.2",
+    "tape": "^4.9.1"
   },
   "engines": {
     "node": ">=0.8.0"
