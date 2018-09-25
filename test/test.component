@@ -1,0 +1,7 @@
+<template processor="html" dst="dst">
+<div></div>
+</template>
+
+<style processor="css" dst="dst/my.css">
+div{display: none;}
+</style>
