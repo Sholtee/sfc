@@ -72,3 +72,4 @@ console.log('kerekesfacapa');
 - 0.0.2: Fixed file naming issue
 - 0.0.3: Improved performance
 - 0.0.4: Fixed node parsing issue
+- 0.0.5: Small improvements
