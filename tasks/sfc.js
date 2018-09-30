@@ -64,7 +64,7 @@ sfc.$transpile = function(grunt, src, options){
 
 sfc.$parseAttributes = function(input){
     const
-        rex = /(\S+)(?:=("|')((?:(?!\2|\n).)*)\2)/g,
+        rex = /([\w-]+)(?:=("|')((?:(?!\2|\n).)*)\2)/g,
         res = {};
 
     for(var ar; (ar = rex.exec(input)) != null;){
@@ -76,7 +76,7 @@ sfc.$parseAttributes = function(input){
 
 sfc.$parseNodes = function(input){
     const
-        rex = /<([\w-]+)\b((?:\s*\S+(?:=("|')((?:(?!\3|\n).)*)\3))*)(?:(?!>).)*>([\s\S]*)<\/\1>$/gm,
+        rex = /<([\w-]+)\b((?:[ \t]*[\w-]+(?:=("|')((?:(?!\3|\n).)*)\3))*)[\w \t-]*>([\s\S]*)<\/\1>$/gm,
         res = [];
 
     for(var ar; (ar = rex.exec(input)) != null;) res.push({

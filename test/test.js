@@ -25,7 +25,7 @@ test('single element parsing test', t => {
 
     var ret = sfc.$parseNodes(
         '<!--comment-->\n' +
-        '<cica-mica    attr="val"     attr2="</cica-mica>" vmi>\n' +
+        '<cica-mica    attr-1="val"     attr-2="</cica-mica>" vmi>\n' +
         'content\n' +
         '</cica-mica>'
     );
@@ -37,8 +37,8 @@ test('single element parsing test', t => {
     t.equal(ret.name, 'cica-mica');
     t.equal(ret.content, '\ncontent\n');
     t.equal(Object.getOwnPropertyNames(ret.attrs).length, 2);
-    t.equal(ret.attrs.attr, 'val');
-    t.equal(ret.attrs.attr2, '</cica-mica>');
+    t.equal(ret.attrs['attr-1'], 'val');
+    t.equal(ret.attrs['attr-2'], '</cica-mica>');
 });
 
 test('multi element parsing test', t => {
@@ -71,7 +71,7 @@ test('transpiling test', t => {
         CSS  = 'dst/my.css';
 
     try {
-        sfc.$transpile(grunt, ['*.component'], {
+        sfc.$transpile(grunt, ['test.component'], {
             processors: {
                 html: content => '<!-- cica -->' + content,
                 css:  content => content
