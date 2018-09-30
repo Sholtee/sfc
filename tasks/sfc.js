@@ -76,7 +76,7 @@ sfc.$parseAttributes = function(input){
 
 sfc.$parseNodes = function(input){
     const
-        rex = /<(\w+)\b((?:\s*\S+(?:=("|')((?:(?!\3|\n).)*)\3))*)(?:(?!>).)*>([\s\S]*)<\/\1>$/gm,
+        rex = /<([\w-]+)\b((?:\s*\S+(?:=("|')((?:(?!\3|\n).)*)\3))*)(?:(?!>).)*>([\s\S]*)<\/\1>$/gm,
         res = [];
 
     for(var ar; (ar = rex.exec(input)) != null;) res.push({

@@ -25,20 +25,20 @@ test('single element parsing test', t => {
 
     var ret = sfc.$parseNodes(
         '<!--comment-->\n' +
-        '<cica    attr="val"     attr2="</cica>" vmi>\n' +
+        '<cica-mica    attr="val"     attr2="</cica-mica>" vmi>\n' +
         'content\n' +
-        '</cica>'
+        '</cica-mica>'
     );
 
     t.equal(ret.length, 1);
 
     ret = ret[0];
 
-    t.equal(ret.name, 'cica');
+    t.equal(ret.name, 'cica-mica');
     t.equal(ret.content, '\ncontent\n');
     t.equal(Object.getOwnPropertyNames(ret.attrs).length, 2);
     t.equal(ret.attrs.attr, 'val');
-    t.equal(ret.attrs.attr2, '</cica>');
+    t.equal(ret.attrs.attr2, '</cica-mica>');
 });
 
 test('multi element parsing test', t => {
