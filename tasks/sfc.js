@@ -13,7 +13,7 @@ module.exports = sfc;
 
 function sfc(grunt){
     grunt.registerMultiTask('sfc', 'Single File Component', function(){
-        sfc.$transpile(grunt, this.data.src, this.data.options);
+        sfc.$transpile(grunt, this.filesSrc, this.data.options);
     });
 }
 
@@ -24,11 +24,11 @@ sfc.$transpile = function(grunt, src, options){
         style:    '.css'
     };
 
-    src.forEach(src => grunt.file.expand({filter: 'isFile'}, src).forEach(filePath => {
-        grunt.log.write('Processing file "' + filePath + '": ');
+    src.forEach(file => {
+        grunt.log.write('Processing file "' + file + '": ');
         var processed = 0;
 
-        this.$parseNodes(fs.readFileSync(filePath).toString()).forEach(node => {
+        this.$parseNodes(fs.readFileSync(file).toString()).forEach(node => {
             const process = options.processors[node.attrs.processor];
             if (!process) return;
 
@@ -45,7 +45,7 @@ sfc.$transpile = function(grunt, src, options){
 
             if (!path.parse(dst).ext) dst = path.format({
                 dir:  dst,
-                name: path.basename(filePath, path.extname(filePath)),
+                name: path.basename(file, path.extname(file)),
                 ext:  exts[node.name.toLowerCase()]
             });
             
@@ -59,7 +59,7 @@ sfc.$transpile = function(grunt, src, options){
         });
 
         grunt.log.writeln(processed + ' file(s) created');
-    }));
+    });
 };
 
 sfc.$parseAttributes = function(input){
