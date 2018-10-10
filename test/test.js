@@ -63,19 +63,19 @@ test('multi element parsing test', t => {
     });
 });
 
-test('transpiling test', t => {
-    t.plan(4);
-
+[undefined, {}, {template: 'html', style: 'kutya'}, {template: '.html'}].forEach(exts => test('transpiling test (exts: ' + JSON.stringify(exts, null, 0) + ')', t => {
     const
         HTML = 'dst/test.html',
-        CSS  = 'dst/my.css';
+        CSS  = 'dst/my.css'; // test.component-ben meg van adva a fajlnev
 
+    t.plan(4);
     try {
         sfc.$transpile(grunt, ['test.component'], {
             processors: {
                 html: content => '<!-- cica -->' + content,
                 css:  content => content
-            }
+            },
+            exts: exts
         });
         
         t.ok(grunt.file.exists(HTML));
@@ -87,4 +87,4 @@ test('transpiling test', t => {
         grunt.file.delete(HTML);
         grunt.file.delete(CSS);
     }
-});
+}));

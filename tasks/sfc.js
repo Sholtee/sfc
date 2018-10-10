@@ -18,11 +18,11 @@ function sfc(grunt){
 }
 
 sfc.$transpile = function(grunt, src, options){
-    const exts = options.exts || {
+    const exts = sfc.$mergeExts(options.exts, {
         template: '.html',
         script:   '.js',
         style:    '.css'
-    };
+    });
 
     src.forEach(file => {
         grunt.log.write('Processing file "' + file + '": ');
@@ -60,6 +60,12 @@ sfc.$transpile = function(grunt, src, options){
 
         grunt.log.writeln(processed + ' file(s) created');
     });
+};
+
+sfc.$mergeExts = function(src = {}, dst){
+    return Object
+        .keys(src)
+        .reduce((dict, key) => Object.assign(dict, {[key]: '.' + src[key].replace(/^\.+/, '')}), dst);
 };
 
 sfc.$parseAttributes = function(input){
