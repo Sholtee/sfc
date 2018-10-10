@@ -29,9 +29,9 @@ grunt.initConfig({
                 // optional extensions (if "dst" does not contain file name), 
                 // defaults to:
                 exts: {
-                    template: 'html',
-                    script: 'js',
-                    style: 'css'		
+                    template: '.html',
+                    script: '.js',
+                    style: '.css'		
                 },
                 processors: {
                     pug: require('pug').render,
@@ -73,3 +73,4 @@ console.log('kerekesfacapa');
 - 0.0.3: Improved performance
 - 0.0.4: Fixed node parsing issue
 - 0.0.5: Small improvements
+- 0.0.6: User defined file extensions (`exts`) are now merged with the defaults
