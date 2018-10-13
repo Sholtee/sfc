@@ -18,7 +18,7 @@ function sfc(grunt){
 }
 
 sfc.$transpile = function(grunt, src, options){
-    const exts = sfc.$mergeExts(options.exts, {
+    const exts = this.$mergeExts(options.exts, {
         template: '.html',
         script:   '.js',
         style:    '.css'
