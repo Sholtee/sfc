@@ -116,7 +116,7 @@ sfc.$parseNodes = function(input){
     return res;
 
     function countLinesTo(end, str){
-        return str.substring(0, end).split(/\n|\r|\r\n/).length;
+        return str.substring(0, end).split(/\r\n|\n|\r/).length;
     }
 
     function strip(str){
