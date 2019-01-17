@@ -1,5 +1,11 @@
+<!--
+  COMMENT
+ -->
+
 <template processor="html" dst="dst">
-<div></div>
+<div>
+  <b>kutya</b>
+</div>
 </template>
 
 <style processor="css" dst="dst/my.css">

@@ -25,7 +25,7 @@ sfc.$transpile = function(grunt, src, options){
     });
 
     src.forEach(file => {
-        grunt.log.write('Processing file "' + file + '": ');
+        grunt.log.write(`Processing file "${file}": `);
         var processed = 0;
 
         this.$parseNodes(fs.readFileSync(file).toString()).forEach(node => {
@@ -48,33 +48,36 @@ sfc.$transpile = function(grunt, src, options){
                 name: path.basename(file, path.extname(file)),
                 ext:  exts[node.name.toLowerCase()]
             });
-            
+
             //
             // TODO: file extending support
             //
 
-            grunt.file.write(dst, process(node.content));
+            grunt.file.write(dst, process.call(node, node.content));
 
             processed++;
         });
 
-        grunt.log.writeln(processed + ' file(s) created');
+        grunt.log.writeln(`${processed} file(s) created`);
     });
 };
 
 sfc.$mergeExts = function(src = {}, dst){
     return Object
         .keys(src)
-        .reduce((dict, key) => Object.assign(dict, {[key]: '.' + src[key].replace(/^\.+/, '')}), dst);
+        .reduce((dict, key) => Object.assign(dict, {
+            [key]: `.${src[key].replace(/^\.+/, '')}`
+        }), dst);
 };
 
 sfc.$parseAttributes = function(input){
     const
-        rex = /([\w-]+)(?:=("|')((?:(?!\2|\n).)*)\2)/g,
+        rex = /([\w-]+)(?:=("|')((?:(?!\2|\r\n|\n|\r).)*)\2)/g,
         res = {};
 
     for(var ar; (ar = rex.exec(input)) != null;){
-        res[ar[1]] = ar[3];
+        const [, key, , value] = ar;
+        res[key] = value;
     }
 
     return res;
@@ -82,15 +85,43 @@ sfc.$parseAttributes = function(input){
 
 sfc.$parseNodes = function(input){
     const
-        rex = /<([\w-]+)\b((?:[ \t]*[\w-]+(?:=("|')((?:(?!\3|\n).)*)\3))*)[\w \t-]*>([\s\S]*)<\/\1>$/gm,
+        rex = /<([\w-]+)\b((?:[ \t]*[\w-]+(?:=("|')((?:(?!\3|\r\n|\n|\r).)*)\3))*)[\w \t-]*>([\s\S]*)<\/\1>$/gm,
         res = [];
 
-    for(var ar; (ar = rex.exec(input)) != null;) res.push({
-        name:    ar[1],
-        attrs:   this.$parseAttributes(ar[2]),
-        content: ar[5]
-    });
+    for(var ar; (ar = rex.exec(input)) != null;) {
+        const
+            [, name, rawAttrs, , , rawContent] = ar,
+
+            startIndex   = ar.index,
+            endIndex     = rex.lastIndex,
+            content      = strip(rawContent),
+
+            nodeStart    = countLinesTo(startIndex, input),
+            nodeEnd      = countLinesTo(endIndex + 1, input),
+            contentLines = countLinesTo(content.length, content);
+
+        res.push({
+            name:         name,
+            attrs:        this.$parseAttributes(rawAttrs),
+            content:      content,
+            srcStart:     startIndex,
+            srcEnd:       endIndex,
+            srcLineStart: nodeStart,
+            srcLineEnd:   nodeEnd,
+            contentStart: nodeStart + Math.min(1, contentLines),
+            contentEnd:   nodeStart + contentLines
+        });
+    }
 
     return res;
+
+    function countLinesTo(end, str){
+        return str.substring(0, end).split(/\n|\r|\r\n/).length;
+    }
+
+    function strip(str){
+        const result = str.replace(/^(\r\n|\n|\r)|(\r\n|\n|\r)$/g, '');
+        return result;
+    }
 };
 })();

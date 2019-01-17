@@ -4,6 +4,7 @@
  ********************************************************************************/
 'use strict';
 
+(function(){
 const
     sfc   = require('../tasks/sfc.js'),
     grunt = require('grunt'),
@@ -41,6 +42,39 @@ test('single element parsing test', t => {
     t.equal(ret.attrs['attr-2'], '</cica-mica>');
 });
 
+test('context test [single line]', t => {
+    t.plan(4);
+
+    const ret = sfc.$parseNodes(
+        '<!--comment-->\n' +
+        '<cica-mica attr-1="val" attr-2="</cica-mica>" vmi>' +
+        'content' +
+        '</cica-mica>'
+    )[0];
+
+    t.equal(ret.srcLineStart, 2);
+    t.equal(ret.srcLineEnd, 2);
+    t.equal(ret.contentStart, 2);
+    t.equal(ret.contentEnd, 2);
+});
+
+test('context test [multi line]', t => {
+    t.plan(4);
+
+    const ret = sfc.$parseNodes(
+        '<!--comment-->\n' +
+        '<cica-mica attr-1="val" attr-2="</cica-mica>" vmi>\n' +
+        '\n' +
+        'content\n' +
+        '</cica-mica>'
+    )[0];
+
+    t.equal(ret.srcLineStart, 2);
+    t.equal(ret.srcLineEnd, 5);
+    t.equal(ret.contentStart, 3);
+    t.equal(ret.contentEnd, 4);
+});
+
 test('multi element parsing test', t => {
     t.plan(11);
 
@@ -55,7 +89,7 @@ test('multi element parsing test', t => {
     t.equal(ret.length, 2);
 
     ret.forEach((ret, idx) => {
-        t.equal(ret.name, idx == 0 ? 'dog' : 'kitty');
+        t.equal(ret.name, idx === 0 ? 'dog' : 'kitty');
         t.equal(ret.content, '<dog></dog>');
         t.equal(Object.getOwnPropertyNames(ret.attrs).length, 2);
         t.equal(ret.attrs.attr1, 'val');
@@ -81,10 +115,11 @@ test('multi element parsing test', t => {
         t.ok(grunt.file.exists(HTML));
         t.ok(grunt.file.exists(CSS));
 
-        t.equal(fs.readFileSync(HTML).toString(), '<!-- cica -->\r\n<div></div>\r\n');
-        t.equal(fs.readFileSync(CSS).toString(), '\r\ndiv{display: none;}\r\n');
+        t.equal(fs.readFileSync(HTML).toString(), '<!-- cica --><div>\r\n  <b>kutya</b>\r\n</div>');
+        t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
     } finally {
         grunt.file.delete(HTML);
         grunt.file.delete(CSS);
     }
 }));
+})();
