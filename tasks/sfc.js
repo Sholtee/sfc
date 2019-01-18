@@ -2,7 +2,7 @@
 *  sfc.js                                                                       *
 *  Author: Denes Solti                                                          *
 ********************************************************************************/
-(function(){
+(function(module){
 'use strict';
 
 const
@@ -108,8 +108,10 @@ sfc.$parseNodes = function(input){
             srcEnd:       endIndex,
             srcLineStart: nodeStart,
             srcLineEnd:   nodeEnd,
-            contentStart: nodeStart + Math.min(1, contentLines),
-            contentEnd:   nodeStart + contentLines
+            
+            // ugly =(
+            contentStart: nodeStart + (rawContent.slice(1) !== content.slice(1) ? 1 : 0),
+            contentEnd:   nodeStart + contentLines - (rawContent.slice(-1) !== content.slice(-1) ? 0 : 1)
         });
     }
 
@@ -124,4 +126,4 @@ sfc.$parseNodes = function(input){
         return result;
     }
 };
-})();
+})(module);

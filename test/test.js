@@ -2,9 +2,8 @@
  *  test.js                                                                      *
  *  Author: Denes Solti                                                          *
  ********************************************************************************/
-'use strict';
-
 (function(){
+'use strict';
 const
     sfc   = require('../tasks/sfc.js'),
     grunt = require('grunt'),
@@ -36,7 +35,7 @@ test('single element parsing test', t => {
     ret = ret[0];
 
     t.equal(ret.name, 'cica-mica');
-    t.equal(ret.content, '\ncontent\n');
+    t.equal(ret.content, 'content');
     t.equal(Object.getOwnPropertyNames(ret.attrs).length, 2);
     t.equal(ret.attrs['attr-1'], 'val');
     t.equal(ret.attrs['attr-2'], '</cica-mica>');
