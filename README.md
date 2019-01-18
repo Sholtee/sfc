@@ -98,23 +98,23 @@ grunt.initConfig({
 .
 function ESLintCli({CLIEngine}){
 	const
-		engine = new CLIEngine({
-			outputFile:  false,
-			quiet:       false,
-			maxWarnings: -1,
-			failOnError: true,
-			configFile:  'eslint.json'
-		}),
-		formatter = CLIEngine.getFormatter('xXx');
+        engine = new CLIEngine({
+            outputFile:  false,
+            quiet:       false,
+            maxWarnings: -1,
+            failOnError: true,
+            configFile:  'eslint.json'
+        }),
+        formatter = CLIEngine.getFormatter('xXx');
 
-	this.validate = function(data, offset = 0){
-		const {errorCount, results} = engine.executeOnText(data);
-
-		results.forEach(result => result.messages.forEach(msg => msg.line += offset));
-
-		grunt.log.writeln(formatter(results));
-		if (errorCount) throw new Error('aborted by ESLint');
-	};
+    this.validate = function(data, offset = 0){
+        const {errorCount, results} = engine.executeOnText(data);
+        
+        results.forEach(result => result.messages.forEach(msg => msg.line += offset));
+        
+        grunt.log.writeln(formatter(results));
+        if (errorCount) throw new Error('aborted by ESLint');
+    };
 }
 ```
 
