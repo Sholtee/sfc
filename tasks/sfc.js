@@ -13,24 +13,26 @@ module.exports = sfc;
 
 function sfc(grunt){
     grunt.registerMultiTask('sfc', 'Single File Component', function(){
-        sfc.$transpile(grunt, this.filesSrc, this.data.options);
+        sfc.$transpile(grunt, this.filesSrc, this.options());
     });
 }
 
-sfc.$transpile = function(grunt, src, options){
-    const exts = this.$mergeExts(options.exts, {
+sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase}){
+    exts = this.$mergeExts(exts, {
         template: '.html',
         script:   '.js',
         style:    '.css'
     });
 
-    src.forEach(file => {
-        grunt.log.write(`Processing file "${file}": `);
+    src.forEach(fileSrc => {
+        log.write(`Processing file "${fileSrc}": `);
         var processed = 0;
 
-        this.$parseNodes(fs.readFileSync(file).toString()).forEach(node => {
-            const process = options.processors[node.attrs.processor];
+        this.$parseNodes(fs.readFileSync(fileSrc).toString()).forEach(node => {
+            const process = processors[node.attrs.processor];
             if (!process) return;
+
+            var dst = template.process(node.attrs.dst);
 
             //
             // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
@@ -41,24 +43,24 @@ sfc.$transpile = function(grunt, src, options){
             //    mindig hamissal ter vissza.
             //
 
-            var dst = grunt.template.process(node.attrs.dst);
-
             if (!path.parse(dst).ext) dst = path.format({
                 dir:  dst,
-                name: path.basename(file, path.extname(file)),
+                name: path.basename(fileSrc, path.extname(fileSrc)),
                 ext:  exts[node.name.toLowerCase()]
             });
+
+            if (dstBase) dst = path.join(dstBase, dst);
 
             //
             // TODO: file extending support
             //
 
-            grunt.file.write(dst, process.call(node, node.content));
+            file.write(dst, process.call(node, node.content));
 
             processed++;
         });
 
-        grunt.log.writeln(`${processed} file(s) created`);
+        log.writeln(`${processed} file(s) created`);
     });
 };
 
