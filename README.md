@@ -26,6 +26,7 @@ grunt.initConfig({
         your_target: {
             src: ['dummy.component'],
             options: {
+                dstBase: '<%= project.dirs.dist %>',
                 // optional extensions (if "dst" does not contain file name), 
                 // defaults to:
                 exts: {
@@ -52,14 +53,15 @@ grunt.initConfig({
 `dummy.component`:
 
 ```sfc
+<!-- Without "dstBase" "dst" should be "<%= project.dirs.dist %>/views/" -->
 <!-- The output file will be named "dummy.html" -->
-<template processor="pug" dst="<%= project.dirs.dist %>/views/">
+<template processor="pug" dst="views/">
 .foo
   .bar XxX
 </template>
 
 <!-- The output file will be named "logic.js" -->
-<script processor="js" dst="<%= project.dirs.dist %>/scripts/logic.js">
+<script processor="js" dst="scripts/logic.js">
 console.log('kerekesfacapa');
 </script>
 .
@@ -128,3 +130,4 @@ function ESLintCli({CLIEngine}){
 - 0.0.7: 
   1. Fixed line ending issue
   2. Processors have their own context (`this`) which includes stuffs (`{name, attrs, content, startIndex, endIndex, nodeStart, nodeEnd, contentStart, contentEnd}`) about the current executing block
+- 0.0.8: You can specify the base of the `dst` attribute (optional) 
