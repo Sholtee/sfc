@@ -97,7 +97,7 @@ grunt.initConfig({
 .
 .
 function ESLintCli({CLIEngine}){
-	const
+    const
         engine = new CLIEngine({
             outputFile:  false,
             quiet:       false,
