@@ -122,8 +122,7 @@ sfc.$parseNodes = function(input){
     }
 
     function strip(str){
-        const result = str.replace(/^(\r\n|\n|\r)|(\r\n|\n|\r)$/g, '');
-        return result;
+        return str.replace(/^(\r\n|\n|\r)|(\r\n|\n|\r)$/g, '');
     }
 };
 })(module);
