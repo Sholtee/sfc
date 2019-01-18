@@ -1,6 +1,6 @@
 # grunt-single-file-component
 
-> A small grunt task which let you keep all the assets of your component in a (custom) single file
+> A small grunt task which lets you keep all the assets of your component in a (custom) single file
 
 Inspired by VUE.
 
@@ -74,3 +74,6 @@ console.log('kerekesfacapa');
 - 0.0.4: Fixed node parsing issue
 - 0.0.5: Small improvements
 - 0.0.6: User defined file extensions (`exts`) are now merged with the defaults
+- 0.0.7: 
+  1. Fixed line ending issue
+  2. Processors have their own context (`this`) which includes stuffs about the current executing block (name, attrs, etc.)
