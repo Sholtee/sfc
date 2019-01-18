@@ -46,7 +46,7 @@ grunt.initConfig({
             }
         }
     }
-})
+});
 ```
 
 `dummy.component`:
@@ -67,6 +67,57 @@ console.log('kerekesfacapa');
 .
 ```
 
+## Getting the correct line numbers (example)
+In the following snippet we're using ESLint to validate `.js` files. Since the linter knows nothing about our component we have to fix the report line numbers manually.
+
+```js
+const eslint = new ESLintCli(require('eslint'));
+.
+.
+.
+grunt.initConfig({
+    sfc: {
+        your_target: {
+            src: ['*.component'],
+            options: {
+                processors: {
+                    js: function(content){
+                        eslint.validate(content, this.nodeStart);
+                        return content;
+                    },
+                    .
+                    .
+                    .
+                }
+            }
+        }
+    }
+});
+.
+.
+.
+function ESLintCli({CLIEngine}){
+	const
+		engine = new CLIEngine({
+			outputFile:  false,
+			quiet:       false,
+			maxWarnings: -1,
+			failOnError: true,
+			configFile:  'eslint.json'
+		}),
+		formatter = CLIEngine.getFormatter('xXx');
+
+	this.validate = function(data, offset = 0){
+		const {errorCount, results} = engine.executeOnText(data);
+
+		results.forEach(result => result.messages.forEach(msg => msg.line += offset));
+
+		grunt.log.writeln(formatter(results));
+		if (errorCount) throw new Error('aborted by ESLint');
+	};
+}
+```
+
 ## Release History
 - 0.0.1: Initial release
 - 0.0.2: Fixed file naming issue
@@ -76,4 +127,4 @@ console.log('kerekesfacapa');
 - 0.0.6: User defined file extensions (`exts`) are now merged with the defaults
 - 0.0.7: 
   1. Fixed line ending issue
-  2. Processors have their own context (`this`) which includes stuffs about the current executing block (name, attrs, etc.)
+  2. Processors have their own context (`this`) which includes stuffs (`{name, attrs, content, startIndex, endIndex, nodeStart, nodeEnd, contentStart, contentEnd}`) about the current executing block
