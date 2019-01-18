@@ -51,8 +51,8 @@ test('context test [single line]', t => {
         '</cica-mica>'
     )[0];
 
-    t.equal(ret.srcLineStart, 2);
-    t.equal(ret.srcLineEnd, 2);
+    t.equal(ret.nodeStart, 2);
+    t.equal(ret.nodeEnd, 2);
     t.equal(ret.contentStart, 2);
     t.equal(ret.contentEnd, 2);
 });
@@ -68,8 +68,8 @@ test('context test [multi line]', t => {
         '</cica-mica>'
     )[0];
 
-    t.equal(ret.srcLineStart, 2);
-    t.equal(ret.srcLineEnd, 5);
+    t.equal(ret.nodeStart, 2);
+    t.equal(ret.nodeEnd, 5);
     t.equal(ret.contentStart, 3);
     t.equal(ret.contentEnd, 4);
 });

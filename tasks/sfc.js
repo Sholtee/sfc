@@ -104,10 +104,10 @@ sfc.$parseNodes = function(input){
             name:         name,
             attrs:        this.$parseAttributes(rawAttrs),
             content:      content,
-            srcStart:     startIndex,
-            srcEnd:       endIndex,
-            srcLineStart: nodeStart,
-            srcLineEnd:   nodeEnd,
+            startIndex:   startIndex,
+            endIndex:     endIndex,
+            nodeStart:    nodeStart,
+            nodeEnd:      nodeEnd,
             
             // ugly =(
             contentStart: nodeStart + (rawContent.slice(1) !== content.slice(1) ? 1 : 0),
