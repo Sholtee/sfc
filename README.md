@@ -48,20 +48,16 @@ Type: `Function`
 
 Fired before transpiling with the following parameters:
 
-- fileName
-  The current component file
-- nodesToProcess
-  The nodes about to processing
+- fileName: The current component file
+- nodesToProcess: The nodes about to processing
   
 #### onTranspileEnd (optional)
 Type: `Function`
 
 Fired after transpiling with the following parameters:
 
-- fileName
-  The current component file
-- nodesProcessed
-  The successfully processed nodes
+- fileName: The current component file
+- nodesProcessed: The successfully processed nodes
 
 ## Usage Example
 In your project's Gruntfile, add a section named `sfc` to the data object passed into `grunt.initConfig()`:
