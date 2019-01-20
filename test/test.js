@@ -2,7 +2,7 @@
  *  test.js                                                                      *
  *  Author: Denes Solti                                                          *
  ********************************************************************************/
-(function(){
+(function(require){
 'use strict';
 const
     sfc   = require('../tasks/sfc.js'),
@@ -102,23 +102,60 @@ test('multi element parsing test', t => {
         CSS  = 'dst/my.css'; // test.component-ben meg van adva a fajlnev
 
     t.plan(4);
-    try {
-        sfc.$transpile(grunt, ['test.component'], {
-            processors: {
-                html: content => '<!-- cica -->' + content,
-                css:  content => content
-            },
-            exts: exts
-        });
-        
-        t.ok(grunt.file.exists(HTML));
-        t.ok(grunt.file.exists(CSS));
 
-        t.equal(fs.readFileSync(HTML).toString(), '<!-- cica --><div>\r\n  <b>kutya</b>\r\n</div>');
-        t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
-    } finally {
-        grunt.file.delete(HTML);
-        grunt.file.delete(CSS);
-    }
+    sfc.$transpile(grunt, ['test.component'], {
+        processors: {
+            html: content => '<!-- cica -->' + content,
+            css:  content => content
+        },
+        exts: exts
+    });
+
+    t.ok(grunt.file.exists(HTML));
+    t.ok(grunt.file.exists(CSS));
+
+    t.equal(fs.readFileSync(HTML).toString(), '<!-- cica --><div>\r\n  <b>kutya</b>\r\n</div>');
+    t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
+
+    grunt.file.delete(HTML);
+    grunt.file.delete(CSS);
 }));
-})();
+
+test('event firing test', t => {
+    const
+        HTML = 'dst\\test.html',
+        CSS  = 'dst\\my.css';
+
+    t.plan(12);
+
+    sfc.$transpile(grunt, ['test.component'], {
+        processors: {
+            html: content => content
+        },
+        exts: {},
+        onTranspileStart: (file, nodes) => {
+            t.equal(file, 'test.component');
+            t.equal(nodes.length, 2);
+
+            const [template, style] = nodes;
+
+            t.equal(template.name, 'template');
+            t.equal(template.dst.replace('/', '\\'), HTML);
+            t.ok(!grunt.file.exists(HTML));
+
+            t.equal(style.name, 'style');
+            t.equal(style.dst.replace('/', '\\'), CSS);
+            t.ok(!grunt.file.exists(CSS));
+        },
+        onTranspileEnd: (file, nodes) => {
+            t.equal(file, 'test.component');
+            t.equal(nodes.length, 1);
+
+            const [template] = nodes;
+            t.equal(template.name, 'template');
+            t.ok(grunt.file.exists(HTML));
+            grunt.file.delete(HTML);
+        }
+    });
+});
+})(require);
