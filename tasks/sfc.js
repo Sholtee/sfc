@@ -2,7 +2,7 @@
 *  sfc.js                                                                       *
 *  Author: Denes Solti                                                          *
 ********************************************************************************/
-(function(module){
+(function(module, require) {
 'use strict';
 
 const
@@ -11,13 +11,13 @@ const
 
 module.exports = sfc;
 
-function sfc(grunt){
-    grunt.registerMultiTask('sfc', 'Single File Component', function(){
+function sfc(grunt) {
+    grunt.registerMultiTask('sfc', 'Single File Component', function() {
         sfc.$transpile(grunt, this.filesSrc, this.options());
     });
 }
 
-sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase}){
+sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase, onTranspileStart, onTranspileEnd}) {
     exts = this.$mergeExts(exts, {
         template: '.html',
         script:   '.js',
@@ -26,12 +26,8 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
 
     src.forEach(fileSrc => {
         log.write(`Processing file "${fileSrc}": `);
-        var processed = 0;
 
-        this.$parseNodes(fs.readFileSync(fileSrc).toString()).forEach(node => {
-            const process = processors[node.attrs.processor];
-            if (!process) return;
-
+        var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).map(node => {
             var dst = template.process(node.attrs.dst);
 
             //
@@ -50,21 +46,30 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             });
 
             if (dstBase) dst = path.join(dstBase, dst);
+            node.dst = dst;
 
-            //
-            // TODO: file extending support
-            //
-
-            file.write(dst, process.call(node, node.content));
-
-            processed++;
+            return node;
         });
 
-        log.writeln(`${processed} file(s) created`);
+        if (isFunction(onTranspileStart)) onTranspileStart(fileSrc, nodes);
+
+        nodes = nodes.filter(node => {
+            const process = processors[node.attrs.processor];
+            if (!process) return;
+
+            file.write(node.dst, process.call(node, node.content));
+            return true;
+        });
+
+        if (isFunction(onTranspileEnd)) onTranspileEnd(fileSrc, nodes);
+        
+        log.writeln(`${nodes.length} file(s) created`);
     });
+
+    function isFunction(value) {return typeof value === 'function';}
 };
 
-sfc.$mergeExts = function(src = {}, dst){
+sfc.$mergeExts = function(src = {}, dst) {
     return Object
         .keys(src)
         .reduce((dict, key) => Object.assign(dict, {
@@ -72,7 +77,7 @@ sfc.$mergeExts = function(src = {}, dst){
         }), dst);
 };
 
-sfc.$parseAttributes = function(input){
+sfc.$parseAttributes = function(input) {
     const
         rex = /([\w-]+)(?:=("|')((?:(?!\2|\r\n|\n|\r).)*)\2)/g,
         res = {};
@@ -85,7 +90,7 @@ sfc.$parseAttributes = function(input){
     return res;
 };
 
-sfc.$parseNodes = function(input){
+sfc.$parseNodes = function(input) {
     const
         rex = /<([\w-]+)\b((?:[ \t]*[\w-]+(?:=("|')((?:(?!\3|\r\n|\n|\r).)*)\3))*)[\w \t-]*>([\s\S]*)<\/\1>$/gm,
         res = [];
@@ -119,12 +124,8 @@ sfc.$parseNodes = function(input){
 
     return res;
 
-    function countLinesTo(end, str){
-        return str.substring(0, end).split(/\r\n|\n|\r/).length;
-    }
+    function countLinesTo(end, str) {return str.substring(0, end).split(/\r\n|\n|\r/).length;}
 
-    function strip(str){
-        return str.replace(/^(\r\n|\n|\r)|(\r\n|\n|\r)$/g, '');
-    }
+    function strip(str) {return str.replace(/^(\r\n|\n|\r)|(\r\n|\n|\r)$/g, '');}
 };
-})(module);
+})(module, require);
