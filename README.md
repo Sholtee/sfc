@@ -17,6 +17,52 @@ One the plugin has been installed, it may be enabled inside your Gruntfile with 
 grunt.loadNpmTasks('grunt-single-file-component');
 ```
 
+### Options
+
+#### dstBase (optional)
+Type: `string`
+
+The base folder of all the `dst` paths.
+
+#### exts (optional)
+Type: `object`
+
+Defines the file extension for the output files if `dst` is a directory.
+
+Defaults to:
+```js
+{
+    template: '.html',
+    script: '.js',
+    style: '.css'		
+}
+```
+
+#### processors
+Type: `object`
+
+Holds the processor functions in `{processorName: processorFunction}` form. During transpiling the content of each component node will be passed to the corresponding processor.
+
+#### onTranspileStart (optional)
+Type: `Function`
+
+Fired before transpiling with the following parameters:
+
+- fileName
+  The current component file
+- nodesToProcess
+  The nodes about to processing
+  
+#### onTranspileEnd (optional)
+Type: `Function`
+
+Fired after transpiling with the following parameters:
+
+- fileName
+  The current component file
+- nodesProcessed
+  The successfully processed nodes
+
 ## Usage Example
 In your project's Gruntfile, add a section named `sfc` to the data object passed into `grunt.initConfig()`:
 
@@ -27,13 +73,6 @@ grunt.initConfig({
             src: ['dummy.component'],
             options: {
                 dstBase: '<%= project.dirs.dist %>',
-                // optional extensions (if "dst" does not contain file name), 
-                // defaults to:
-                exts: {
-                    template: '.html',
-                    script: '.js',
-                    style: '.css'		
-                },
                 processors: {
                     pug: require('pug').render,
                     js: function(content){
@@ -129,5 +168,6 @@ function ESLintCli({CLIEngine}){
 - 0.0.6: User defined file extensions (`exts`) are now merged with the defaults
 - 0.0.7: 
   1. Fixed line ending issue
-  2. Processors have their own context (`this`) which includes stuffs (`{name, attrs, content, startIndex, endIndex, nodeStart, nodeEnd, contentStart, contentEnd}`) about the current executing block
-- 0.0.8: You can specify the base of the `dst` attribute (optional) 
+  2. Processors have their own context (`this`) which includes stuffs (`{name, dst, attrs, content, startIndex, endIndex, nodeStart, nodeEnd, contentStart, contentEnd}`) about the current executing block
+- 0.0.8: You can specify the base of the `dst` attribute (optional)
+- 0.0.9: You can hook into transpiling process by setting the `onTranspileStart` and `onTranspileEnd` fields (optional)
