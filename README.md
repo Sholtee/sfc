@@ -21,17 +21,13 @@ grunt.loadNpmTasks('grunt-single-file-component');
 
 #### dstBase (optional)
 Type: `string`
+Default: `undefined`
 
 The base folder of all the `dst` paths.
 
 #### exts (optional)
 Type: `object`
-
-Defines the file extension for the output files if `dst` is a directory. Note
-- The object you passed will be merged with the defaults. 
-- Dot prefix can be omitted.
-
-Defaults to:
+Default:
 ```js
 {
     template: '.html',
@@ -39,6 +35,10 @@ Defaults to:
     style: '.css'		
 }
 ```
+
+Defines the file extension for the output files if `dst` is a directory. Note
+- The object you passed will be merged with the defaults. 
+- Dot prefix can be omitted.
 
 #### processors
 Type: `object`
@@ -50,6 +50,7 @@ Processors have only one parameter:
 
 #### onTranspileStart (optional)
 Type: `Function`
+Default: `undefined`
 
 Fired before transpiling with the following parameters:
 
@@ -58,14 +59,16 @@ Fired before transpiling with the following parameters:
   
 #### onTranspileEnd (optional)
 Type: `Function`
+Default: `undefined`
 
 Fired after transpiling with the following parameters:
 
 - fileName: The current component file
 - nodesProcessed: The successfully processed nodes
 
-#### quiet
+#### quiet (optional)
 Type: `boolean`
+Default: `false`
 
 Tells the system whether or not output messages to the console. 
 
