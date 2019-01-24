@@ -39,7 +39,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             if (!process) return false;
 
             const result = process.call(node, node.content);
-            if (result) file.write(parseDst(node), result);
+            if (result && node.dst) file.write(node.dst, result);
 
             return !!result;
         });
