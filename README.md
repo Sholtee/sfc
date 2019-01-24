@@ -105,7 +105,7 @@ console.log('kerekesfacapa');
 ```
 
 ## Getting the correct line numbers (example)
-In the following snippet we're using ESLint to validate `.js` files. Since the linter knows nothing about our component we have to fix the report line numbers manually.
+In the following snippet we're using ESLint to validate `.js` files. Since the linter knows nothing about our component we have to fix the report line numbers manually:
 
 ```js
 const eslint = new ESLintCli(require('eslint'));
@@ -153,6 +153,52 @@ function ESLintCli({CLIEngine}){
         if (errorCount) throw new Error('aborted by ESLint');
     };
 }
+```
+
+## Referencing the template from the script (example)
+Sometimes it can be useful not to hardcode the template path into your script. The following code does the trick:
+ 
+```js
+const path = require('path');
+.
+.
+.
+grunt.initConfig({
+    sfc: {
+        your_target: {
+            src: ['*.component'],
+            options: {
+                processors: {
+                    js: function(content){
+                        // "%%TEMPLATE_URL%%" will act as a magic constant in your script
+                        return content.replace(/%%TEMPLATE_URL%%/g, `'${this.$$templateUrl}'`);
+                    },
+                    .
+                    .
+                    .
+                },
+                onTranspileStart: (file, nodes) => {
+                    const template = findNode('template');
+                    if (!template) return;
+                    
+                    const script = findNode('script');
+                    if (!script) return;
+                    
+                    const originalDst = template.attrs.dst;
+                    
+                    script.$$templateUrl = isFile(originalDst)
+                        ? originalDst
+                        // ".posix" is necessary for proper separating
+                        : path.posix.join(originalDst, getFileName(template.dst));
+                    
+                    function isFile(file) {return !!path.parse(file).ext;}
+                    function getFileName(file) {return path.parse(file).base;}
+                    function findNode(name) {return nodes.find(node => node.name === name);}
+                }
+            }
+        }
+    }
+});
 ```
 
 ## Release History
