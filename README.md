@@ -21,12 +21,14 @@ grunt.loadNpmTasks('grunt-single-file-component');
 
 #### dstBase (optional)
 Type: `string`
+
 Default: `undefined`
 
 The base folder of all the `dst` paths.
 
 #### exts (optional)
 Type: `object`
+
 Default:
 ```js
 {
@@ -50,6 +52,7 @@ Processors have only one parameter:
 
 #### onTranspileStart (optional)
 Type: `Function`
+
 Default: `undefined`
 
 Fired before transpiling with the following parameters:
@@ -59,6 +62,7 @@ Fired before transpiling with the following parameters:
   
 #### onTranspileEnd (optional)
 Type: `Function`
+
 Default: `undefined`
 
 Fired after transpiling with the following parameters:
@@ -68,6 +72,7 @@ Fired after transpiling with the following parameters:
 
 #### quiet (optional)
 Type: `boolean`
+
 Default: `false`
 
 Tells the system whether or not output messages to the console. 
