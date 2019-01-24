@@ -59,6 +59,59 @@ Fired after transpiling with the following parameters:
 - fileName: The current component file
 - nodesProcessed: The successfully processed nodes
 
+## Processor context
+Each processor has its own context (accessible via `this`) during execution. This context has the following properties:
+
+#### name
+Type: `string`
+ 
+The name of the current node (e.g. "template").
+
+#### dst
+Type: `string`
+
+The destination file (of the output).
+
+#### attrs
+Type: `object`
+
+All the attributes (e.g. "dst") of the current node (including custom ones).
+
+#### content
+Type: `string`
+
+The content of the current node.
+
+#### startIndex
+Type: `int`
+
+The start index of the node.
+
+#### endIndex
+Type: `int`
+
+The end index of the node.
+
+#### nodeStart
+Type: `int`
+
+The start line of the node.
+
+#### nodeEnd
+Type: `int`
+
+The end line of the node.
+
+#### contentStart
+Type: `int`
+
+The start line of the content.
+
+#### contentEnd
+Type: `int`
+
+The end line of the content.
+
 ## Usage Example
 In your project's Gruntfile, add a section named `sfc` to the data object passed into `grunt.initConfig()`:
 
@@ -155,7 +208,7 @@ function ESLintCli({CLIEngine}){
 }
 ```
 
-## Referencing the template from the script (example)
+## Referencing the template from your script (example)
 Sometimes it can be useful not to hardcode the template path into your script. The following code does the trick:
  
 ```js
@@ -210,6 +263,7 @@ grunt.initConfig({
 - 0.0.6: User defined file extensions (`exts`) are now merged with the defaults
 - 0.0.7: 
   1. Fixed line ending issue
-  2. Processors have their own context (`this`) which includes stuffs (`{name, dst, attrs, content, startIndex, endIndex, nodeStart, nodeEnd, contentStart, contentEnd}`) about the current executing block
-- 0.0.8: You can specify the base of the `dst` attribute (optional)
-- 0.0.9: You can hook into transpiling process by setting the `onTranspileStart` and `onTranspileEnd` fields (optional)
+  2. Processors context
+- 0.0.8: Added `dstBase` option
+- 0.0.9: Added `onTranspileStart` and `onTranspileEnd` hooks
+- 0.0.10: More detailed readme
