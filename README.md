@@ -27,7 +27,9 @@ The base folder of all the `dst` paths.
 #### exts (optional)
 Type: `object`
 
-Defines the file extension for the output files if `dst` is a directory.
+Defines the file extension for the output files if `dst` is a directory. Note
+  1. The object you passed will be merged with the defaults. 
+  2. Dot prefix can be omitted.
 
 Defaults to:
 ```js
@@ -85,22 +87,22 @@ The content of the current node.
 #### startIndex
 Type: `int`
 
-The start index of the node.
+The start index of the current node.
 
 #### endIndex
 Type: `int`
 
-The end index of the node.
+The end index of the current node.
 
 #### nodeStart
 Type: `int`
 
-The start line of the node.
+The start line of the current node.
 
 #### nodeEnd
 Type: `int`
 
-The end line of the node.
+The end line of the current node.
 
 #### contentStart
 Type: `int`
