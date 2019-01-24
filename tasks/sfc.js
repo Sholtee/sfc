@@ -53,12 +53,14 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
 
         if (isFunction(onTranspileStart)) onTranspileStart(fileSrc, nodes);
 
-        nodes = nodes.filter(node => {
-            const process = processors[node.attrs.processor];
-            if (!process) return;
+        nodes = nodes.filter(function({attrs, content, dst}) {
+            const process = processors[attrs.processor];
+            if (!process) return false;
 
-            file.write(node.dst, process.call(node, node.content));
-            return true;
+            const result = process.call(arguments[0], content);
+            if (result) file.write(dst, result);
+
+            return !!result;
         });
 
         if (isFunction(onTranspileEnd)) onTranspileEnd(fileSrc, nodes);
