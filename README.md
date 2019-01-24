@@ -341,3 +341,4 @@ grunt.initConfig({
   1. Processors can return falsy
   2. More detailed readme
 - 0.0.11: `dst` is back
+- 0.0.12: Fixed missing template processing
