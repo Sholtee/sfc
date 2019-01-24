@@ -17,7 +17,7 @@ function sfc(grunt) {
     });
 }
 
-sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase, onTranspileStart, onTranspileEnd}) {
+sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase, quiet, onTranspileStart, onTranspileEnd}) {
     exts = this.$mergeExts(exts, {
         template: '.html',
         script:   '.js',
@@ -25,7 +25,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
     });
 
     src.forEach(fileSrc => {
-        log.write(`Processing file "${fileSrc}": `);
+        if (!quiet) log.write(`Processing file "${fileSrc}": `);
 
         var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).map(node => {
             if (node.attrs.dst) node.dst = parseDst(node);
@@ -46,7 +46,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
 
         if (isFunction(onTranspileEnd)) onTranspileEnd(fileSrc, nodes);
         
-        log.writeln(`${nodes.length} file(s) created`);
+        if (!quiet) log.writeln(`${nodes.length} file(s) created`);
 
         function parseDst({name, attrs: {dst}}){
             dst = template.process(dst);

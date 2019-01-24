@@ -114,7 +114,8 @@ test('multi element parsing test', t => {
             html: content => '<!-- cica -->' + content,
             css:  content => content
         },
-        exts: exts
+        exts: exts,
+        quiet: true
     });
 
     t.ok(grunt.file.exists(HTML));
@@ -161,7 +162,8 @@ test('event firing test', t => {
             t.equal(template.name, 'template');
             t.ok(grunt.file.exists(HTML));
             grunt.file.delete(HTML);
-        }
+        },
+        quiet: true
     });
 });
 })(require);

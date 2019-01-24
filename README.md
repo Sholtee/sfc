@@ -64,6 +64,11 @@ Fired after transpiling with the following parameters:
 - fileName: The current component file
 - nodesProcessed: The successfully processed nodes
 
+#### quiet
+Type: `boolean`
+
+Tells the system whether or not output messages to the console. 
+
 ## Processor context
 Each processor has its own context (accessible via `this`) during execution. This context has the following properties:
 
