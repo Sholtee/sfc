@@ -67,11 +67,6 @@ Type: `string`
  
 The name of the current node (e.g. "template").
 
-#### dst
-Type: `string`
-
-The destination file (of the output).
-
 #### attrs
 Type: `object`
 

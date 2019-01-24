@@ -27,38 +27,16 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
     src.forEach(fileSrc => {
         log.write(`Processing file "${fileSrc}": `);
 
-        var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).map(node => {
-            var dst = template.process(node.attrs.dst);
-
-            //
-            // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
-            // nevet es az "exts" szerinti kiterjesztest kapja.
-            //
-            // Megjegyzes:
-            //    NE a grunt.file.isFile()-t hasznaljuk mert az nem letezo utvonalnal
-            //    mindig hamissal ter vissza.
-            //
-
-            if (!path.parse(dst).ext) dst = path.format({
-                dir:  dst,
-                name: path.basename(fileSrc, path.extname(fileSrc)),
-                ext:  exts[node.name.toLowerCase()]
-            });
-
-            if (dstBase) dst = path.join(dstBase, dst);
-            node.dst = dst;
-
-            return node;
-        });
+        var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString());
 
         if (isFunction(onTranspileStart)) onTranspileStart(fileSrc, nodes);
 
-        nodes = nodes.filter(function({attrs, content, dst}) {
-            const process = processors[attrs.processor];
+        nodes = nodes.filter(node => {
+            const process = processors[node.attrs.processor];
             if (!process) return false;
 
-            const result = process.call(arguments[0], content);
-            if (result) file.write(dst, result);
+            const result = process.call(node, node.content);
+            if (result) file.write(parseDst(node), result);
 
             return !!result;
         });
@@ -66,6 +44,36 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         if (isFunction(onTranspileEnd)) onTranspileEnd(fileSrc, nodes);
         
         log.writeln(`${nodes.length} file(s) created`);
+
+        function parseDst(node){
+            var dst = template.process(node.attrs.dst);
+
+            //
+            // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
+            // nevet es az "exts" szerinti kiterjesztest kapja.
+            //
+            // Megjegyzes:
+            //
+            //
+
+            if (!isFile(dst)) dst = path.format({
+                dir:  dst,
+                name: fileNameWithoutExtension(fileSrc),
+                ext:  exts[node.name.toLowerCase()]
+            });
+
+            if (dstBase) dst = path.join(dstBase, dst);
+            return dst;
+
+            function fileNameWithoutExtension(file) {return path.basename(file, path.extname(file));}
+
+            //
+            // NE a grunt.file.isFile()-t hasznaljuk mert az nem letezo utvonalnal
+            // mindig hamissal ter vissza.
+            //
+
+            function isFile(file) {return !!path.parse(file).ext;}
+        }
     });
 
     function isFunction(value) {return typeof value === 'function';}
