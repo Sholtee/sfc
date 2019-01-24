@@ -311,6 +311,8 @@ grunt.initConfig({
                     if (!script) return;
                     
                     script.$$templatePath = template.dst;
+                    
+                    function findNode(name) {return nodes.find(node => node.name === name);}
                 }
             }
         }
