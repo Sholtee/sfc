@@ -141,14 +141,22 @@ grunt.initConfig({
 `dummy.component`:
 
 ```sfc
-<!-- Without "dstBase" "dst" should be "<%= project.dirs.dist %>/views/" -->
-<!-- The output file will be named "dummy.html" -->
+<!-- 
+  Notes:
+    0) At least the "processor" attribute must be set on each node 
+    1) Without "dstBase" "dst" should be "<%= project.dirs.dist %>/views/"
+    2) The output file will be named "dummy.html" (because "dst" is a folder)
+    3) Without "dst" the output of the processor will be treated as void
+-->
 <template processor="pug" dst="views/">
 .foo
   .bar XxX
 </template>
 
-<!-- The output file will be named "logic.js" -->
+<!--
+  Notes:
+    0) The output file will be named "logic.js" (because "dst" is a file)
+-->
 <script processor="js" dst="scripts/logic.js">
 console.log('kerekesfacapa');
 </script>
@@ -269,3 +277,4 @@ grunt.initConfig({
 - 0.0.10:
   1. Processors can return falsy
   2. More detailed readme
+- 0.0.11: `dst` is back
