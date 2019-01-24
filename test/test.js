@@ -10,6 +10,12 @@ const
     fs    = require('fs'),
     test  = require('tape');
 
+grunt.initConfig({
+    dirs: {
+        dst: 'dst'
+    }
+});
+
 test('attribute parser test', t => {
     t.plan(3);
 

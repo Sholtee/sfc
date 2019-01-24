@@ -1,13 +1,11 @@
-<!--
-  COMMENT
- -->
-
+<!-- Output file should be "dst/test.html" -->
 <template processor="html" dst="dst">
 <div>
   <b>kutya</b>
 </div>
 </template>
 
-<style processor="css" dst="dst/my.css">
+<!-- Output file should be "dst/my.css"-->
+<style processor="css" dst="<%= dirs.dst %>/my.css">
 div{display: none;}
 </style>
