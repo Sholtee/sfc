@@ -52,9 +52,6 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
             // nevet es az "exts" szerinti kiterjesztest kapja.
             //
-            // Megjegyzes:
-            //
-            //
 
             if (!isFile(dst)) dst = path.format({
                 dir:  dst,
