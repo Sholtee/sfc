@@ -28,8 +28,8 @@ The base folder of all the `dst` paths.
 Type: `object`
 
 Defines the file extension for the output files if `dst` is a directory. Note
-  1. The object you passed will be merged with the defaults. 
-  2. Dot prefix can be omitted.
+- The object you passed will be merged with the defaults. 
+- Dot prefix can be omitted.
 
 Defaults to:
 ```js
