@@ -102,7 +102,7 @@ test('multi element parsing test', t => {
     });
 });
 
-[undefined, {}, {template: 'html', style: 'kutya'}, {template: '.html'}].forEach(exts => test('transpiling test (exts: ' + JSON.stringify(exts, null, 0) + ')', t => {
+[undefined, {}, {template: 'html', style: 'kutya'}, {template: '.html'}].forEach(exts => test(`transpiling test (exts: ${JSON.stringify(exts, null, 0)})`, t => {
     const
         HTML = 'dst/test.html',
         CSS  = 'dst/my.css'; // test.component-ben meg van adva a fajlnev
@@ -127,6 +127,32 @@ test('multi element parsing test', t => {
     grunt.file.delete(HTML);
     grunt.file.delete(CSS);
 }));
+
+test('dstBase test', t => {
+    const
+        HTML = 'dst/test_no_base.html',
+        CSS  = 'dst/my.css';
+
+    t.plan(4);
+
+    sfc.$transpile(grunt, ['test_no_base.component'], {
+        processors: {
+            html: content => content,
+            css:  content => content
+        },
+        dstBase: 'dst',
+        quiet: true
+    });
+
+    t.ok(grunt.file.exists(HTML));
+    t.ok(grunt.file.exists(CSS));
+
+    t.equal(fs.readFileSync(HTML).toString(), '<div>\r\n  <b>kutya</b>\r\n</div>');
+    t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
+
+    grunt.file.delete(HTML);
+    grunt.file.delete(CSS);
+});
 
 test('event firing test', t => {
     const

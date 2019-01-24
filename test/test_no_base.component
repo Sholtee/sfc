@@ -1,0 +1,11 @@
+<!-- Output file should be "dst/test_no_base.html" -->
+<template processor="html" dst="/">
+<div>
+  <b>kutya</b>
+</div>
+</template>
+
+<!-- Output file should be "dst/my.css"-->
+<style processor="css" dst="my.css">
+div{display: none;}
+</style>
