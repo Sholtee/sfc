@@ -67,6 +67,11 @@ Type: `string`
  
 The name of the current node (e.g. "template").
 
+#### dst
+Type: `string`
+
+The destination file (of the output). Valid only if the `dst` attribute is set on the current node.
+
 #### attrs
 Type: `object`
 

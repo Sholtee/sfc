@@ -126,7 +126,7 @@ test('event firing test', t => {
         HTML = 'dst\\test.html',
         CSS  = 'dst\\my.css';
 
-    t.plan(10);
+    t.plan(12);
 
     sfc.$transpile(grunt, ['test.component'], {
         processors: {
@@ -140,9 +140,11 @@ test('event firing test', t => {
             const [template, style] = nodes;
 
             t.equal(template.name, 'template');
+            t.equal(template.dst.replace('/', '\\'), HTML);
             t.ok(!grunt.file.exists(HTML));
 
             t.equal(style.name, 'style');
+            t.equal(style.dst.replace('/', '\\'), CSS);
             t.ok(!grunt.file.exists(CSS));
         },
         onTranspileEnd: (file, nodes) => {

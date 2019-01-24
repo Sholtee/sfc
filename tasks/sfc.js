@@ -27,7 +27,10 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
     src.forEach(fileSrc => {
         log.write(`Processing file "${fileSrc}": `);
 
-        var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString());
+        var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).map(node => {
+            if (node.attrs.dst) node.dst = parseDst(node);
+            return node;
+        });
 
         if (isFunction(onTranspileStart)) onTranspileStart(fileSrc, nodes);
 
@@ -45,9 +48,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         
         log.writeln(`${nodes.length} file(s) created`);
 
-        function parseDst(node){
-            var dst = template.process(node.attrs.dst);
-
+        function parseDst({name, attrs: {dst}}){
             //
             // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
             // nevet es az "exts" szerinti kiterjesztest kapja.
@@ -56,7 +57,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             if (!isFile(dst)) dst = path.format({
                 dir:  dst,
                 name: fileNameWithoutExtension(fileSrc),
-                ext:  exts[node.name.toLowerCase()]
+                ext:  exts[name.toLowerCase()]
             });
 
             if (dstBase) dst = path.join(dstBase, dst);
