@@ -124,7 +124,7 @@ grunt.initConfig({
                 dstBase: '<%= project.dirs.dist %>',
                 processors: {
                     pug: require('pug').render,
-                    js: function(content){
+                    js: content => {
                         // do something with the content
                         return content;
                     },
@@ -140,7 +140,7 @@ grunt.initConfig({
 
 `dummy.component`:
 
-```sfc
+```xml
 <!-- 
   Notes:
     0) At least the "processor" attribute must be set on each node 
@@ -216,7 +216,7 @@ function ESLintCli({CLIEngine}){
 }
 ```
 
-## Referencing the template from your script (example)
+## Referencing the template URL from your script (example)
 Sometimes it can be useful not to hardcode the template path into your script. The following code does the trick:
  
 ```js
@@ -255,6 +255,62 @@ grunt.initConfig({
                     function isFile(file) {return !!path.parse(file).ext;}
                     function getFileName(file) {return path.parse(file).base;}
                     function findNode(name) {return nodes.find(node => node.name === name);}
+                }
+            }
+        }
+    }
+});
+```
+
+## Referencing the template content from your script (example)
+For example in AngularJS the template can be included in the js file. To achieve this we compile the template first and then we interpolate it back into the script:
+
+`dummy.ng`:
+
+```xml
+<!-- 
+  Because the order is matter, we have to put the template on the first place so the compiled  
+  HTML will be accessible to the following processors.
+-->
+<template processor="pug" dst="<%= project.dirs.tmp %>/views/">
+.foo
+  .bar XxX
+</template>
+
+<script processor="js" dst="<%= project.dirs.dist %>/scripts/">
+console.log(%%TEMPLATE%%);
+</script>
+.
+.
+.
+```
+
+`gruntfile`:
+
+```js
+grunt.initConfig({
+    sfc: {
+        your_target: {
+            src: ['*.ng'],
+            options: {
+                processors: {
+                    pug: require('pug').render,
+                    js: function(content){
+                        const template = grunt.file.read(this.$$templatePath);
+                        return content.replace('%%TEMPLATE%%', `'${template}'`);;
+                    },
+                    .
+                    .
+                    .
+                },                
+                onTranspileStart: (file, nodes) => {
+                    const template = findNode('template');
+                    if (!template) return;
+                    
+                    const script = findNode('script');
+                    if (!script) return;
+                    
+                    script.$$templatePath = template.dst;
                 }
             }
         }
