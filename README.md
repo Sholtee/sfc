@@ -261,4 +261,6 @@ grunt.initConfig({
   2. Processors context
 - 0.0.8: Added `dstBase` option
 - 0.0.9: Added `onTranspileStart` and `onTranspileEnd` hooks
-- 0.0.10: More detailed readme
+- 0.0.10:
+  1. Processors can return falsy
+  2. More detailed readme
