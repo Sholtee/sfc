@@ -49,6 +49,8 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         log.writeln(`${nodes.length} file(s) created`);
 
         function parseDst({name, attrs: {dst}}){
+            dst = template.process(dst);
+            
             //
             // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
             // nevet es az "exts" szerinti kiterjesztest kapja.
