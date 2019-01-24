@@ -43,7 +43,10 @@ Defaults to:
 #### processors
 Type: `object`
 
-Holds the processor functions in `{processorName: processorFunction}` form. During transpiling the content of each component node will be passed to the corresponding processor.
+Holds the processor functions in `{processorName: processorFunction}` form. During transpiling the content of each component node will be passed to the corresponding processor (identified by the `processor` attribute).
+Processors have only one parameter:
+- content: The content of the current node to be transpiled
+- retVal: The transpiled content to be written out
 
 #### onTranspileStart (optional)
 Type: `Function`
