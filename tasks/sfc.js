@@ -76,19 +76,19 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         }
     });
 
-    function callHook(hooks, ...args) {
+    function callHook(hook, ...args) {
         switch (true) {
-            case typeof hooks === 'function': {
-                call(hooks);
+            case typeof hook === 'function': {
+                call(hook);
                 break;
             }
-            case Array.isArray(hooks): {
-                hooks.forEach(call);
+            case Array.isArray(hook): {
+                hook.forEach(call);
                 break;
             }
         }
 
-        function call(hook) {hook(...args);}
+        function call(fn) {fn(...args);}
     }
 };
 

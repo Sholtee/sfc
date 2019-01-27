@@ -51,7 +51,7 @@ Processors have only one parameter:
 - retVal: The transpiled content to be written out
 
 #### onTranspileStart (optional)
-Type: `Function`
+Type: `Function | Function[]`
 
 Default: `undefined`
 
@@ -61,7 +61,7 @@ Fired before transpiling with the following parameters:
 - nodesToProcess: The nodes about to processing
   
 #### onTranspileEnd (optional)
-Type: `Function`
+Type: `Function | Function[]`
 
 Default: `undefined`
 
@@ -161,10 +161,11 @@ grunt.initConfig({
 ```xml
 <!-- 
   Notes:
-    0) At least the "processor" attribute must be set on each node 
-    1) Without "dstBase" "dst" should be "<%= project.dirs.dist %>/views/"
-    2) The output file will be named "dummy.html" (because "dst" is a folder)
-    3) Without "dst" the output of the processor will be treated as void
+    0) Node names must be unique (per component)
+    1) At least the "processor" attribute must be set on each node 
+    2) Without "dstBase" "dst" should be "<%= project.dirs.dist %>/views/"
+    3) The output file will be named "dummy.html" (because "dst" is a folder)
+    4) Without "dst" the output of the processor will be treated as void
 -->
 <template processor="pug" dst="views/">
 .foo
@@ -355,4 +356,5 @@ grunt.initConfig({
   2. More detailed readme
 - 0.0.11: `dst` is back
 - 0.0.12: Fixed missing grunt.template.process() call
-- 0.0.13: Options.quiet
+- 0.0.13: Added `quiet` option
+- 0.0.14: `onTranspileStart` and `onTranspileEnd` can be func[]
