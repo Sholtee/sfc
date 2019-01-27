@@ -288,7 +288,7 @@ For example in AngularJS the template can be included in the js file. To achieve
 
 ```xml
 <!-- 
-  Because the order is matter, we have to put the template on the first place so the compiled  
+  Since the order is matter, we have to put the template on the first place so the compiled  
   HTML will be accessible to the following processors.
 -->
 <template processor="pug" dst="<%= project.dirs.tmp %>/views/">
