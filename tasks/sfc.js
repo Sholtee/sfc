@@ -32,7 +32,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             return node;
         });
 
-        if (isFunction(onTranspileStart)) onTranspileStart(fileSrc, nodes);
+        callHook(onTranspileStart, fileSrc, nodes);
 
         nodes = nodes.filter(node => {
             const process = processors[node.attrs.processor];
@@ -44,7 +44,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             return !!result;
         });
 
-        if (isFunction(onTranspileEnd)) onTranspileEnd(fileSrc, nodes);
+        callHook(onTranspileEnd, fileSrc, nodes);
         
         if (!quiet) log.writeln(`${nodes.length} file(s) created`);
 
@@ -76,7 +76,20 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         }
     });
 
-    function isFunction(value) {return typeof value === 'function';}
+    function callHook(hooks, ...args) {
+        switch (true) {
+            case typeof hooks === 'function': {
+                call(hooks);
+                break;
+            }
+            case Array.isArray(hooks): {
+                hooks.forEach(call);
+                break;
+            }
+        }
+
+        function call(hook) {hook(...args);}
+    }
 };
 
 sfc.$mergeExts = function(src = {}, dst) {

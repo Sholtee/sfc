@@ -180,7 +180,7 @@ test('event firing test', t => {
             t.equal(style.dst.replace('/', '\\'), CSS);
             t.ok(!grunt.file.exists(CSS));
         },
-        onTranspileEnd: (file, nodes) => {
+        onTranspileEnd: [(file, nodes) => {
             t.equal(file, 'test.component');
             t.equal(nodes.length, 1);
 
@@ -188,7 +188,7 @@ test('event firing test', t => {
             t.equal(template.name, 'template');
             t.ok(grunt.file.exists(HTML));
             grunt.file.delete(HTML);
-        },
+        }],
         quiet: true
     });
 });
