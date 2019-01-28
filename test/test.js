@@ -47,6 +47,46 @@ test('single element parsing test', t => {
     t.equal(ret.attrs['attr-2'], '</cica-mica>');
 });
 
+test('multi element parsing test', t => {
+    t.plan(11);
+
+    const ret = sfc.$parseNodes(
+        '<!--\n' +
+        '    comment\n' +
+        '-->\n' +
+        '<dog attr1="val" attr2="kutya" vmi><dog></dog></dog>\n' +
+        '<kitty attr1="val" attr2="kutya" vmi><dog></dog></kitty>\n'
+    );
+
+    t.equal(ret.length, 2);
+
+    ret.forEach((ret, idx) => {
+        t.equal(ret.name, idx === 0 ? 'dog' : 'kitty');
+        t.equal(ret.content, '<dog></dog>');
+        t.equal(Object.getOwnPropertyNames(ret.attrs).length, 2);
+        t.equal(ret.attrs.attr1, 'val');
+        t.equal(ret.attrs.attr2, 'kutya');
+    });
+});
+
+test('empty element parsing test', t => {
+    t.plan(4);
+
+    var ret = sfc.$parseNodes(
+        '<!--\n' +
+        '    comment\n' +
+        '-->\n' +
+        '<dog></dog>'
+    );
+
+    t.equal(ret.length, 1);
+    ret = ret[0];
+    
+    t.equal(ret.name, 'dog');
+    t.equal(ret.content, '');
+    t.equal(Object.getOwnPropertyNames(ret.attrs).length, 0);
+});
+
 test('context test [single line]', t => {
     t.plan(4);
 
@@ -78,28 +118,6 @@ test('context test [multi line]', t => {
     t.equal(ret.nodeEnd, 5);
     t.equal(ret.contentStart, 3);
     t.equal(ret.contentEnd, 4);
-});
-
-test('multi element parsing test', t => {
-    t.plan(11);
-
-    const ret = sfc.$parseNodes(
-        '<!--\n' +
-        '    comment\n' +
-        '-->\n' +
-        '<dog attr1="val" attr2="kutya" vmi><dog></dog></dog>\n' +
-        '<kitty attr1="val" attr2="kutya" vmi><dog></dog></kitty>\n'
-    );
-
-    t.equal(ret.length, 2);
-
-    ret.forEach((ret, idx) => {
-        t.equal(ret.name, idx === 0 ? 'dog' : 'kitty');
-        t.equal(ret.content, '<dog></dog>');
-        t.equal(Object.getOwnPropertyNames(ret.attrs).length, 2);
-        t.equal(ret.attrs.attr1, 'val');
-        t.equal(ret.attrs.attr2, 'kutya');
-    });
 });
 
 [undefined, {}, {template: 'html', style: 'kutya'}, {template: '.html'}].forEach(exts => test(`transpiling test (exts: ${JSON.stringify(exts, null, 0)})`, t => {

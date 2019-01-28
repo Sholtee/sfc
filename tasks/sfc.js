@@ -36,7 +36,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
 
         nodes = nodes.filter(node => {
             const process = processors[node.attrs.processor];
-            if (!process) return false;
+            if (!process || !node.content) return false;
 
             const result = process.call(node, node.content);
             if (result && node.dst) file.write(node.dst, result);
