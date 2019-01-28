@@ -304,7 +304,7 @@ console.log(%%TEMPLATE%%);
 .
 ```
 
-`gruntfile`:
+`gruntfile.js`:
 
 ```js
 grunt.initConfig({
@@ -337,6 +337,93 @@ grunt.initConfig({
         }
     }
 });
+```
+
+## Sample processors
+In this section you can see a set of sample processors. They are not intended to have their own repository, I just aim them to be a good starting point.
+
+`pug-processor.js`:
+
+```js
+(function(module, require) {
+const pug = require('pug');
+
+module.exports = function PugProcessor(basedir, scope) {
+    return function pugProcessor(src) {
+        src = '\n'.repeat(this.nodeStart) + src; // line number fix
+        return pug.compile(src, {basedir: basedir, pretty: true})(scope);
+    };
+};
+    
+})(module, require);
+```
+
+`sass-processor.js`:
+
+```js
+(function(module, require) {
+const sass = require('node-sass');
+
+module.exports = function SassProcessor(basedir) {
+    return function sassProcessor(src) {
+        try {
+            src = '\n'.repeat(this.nodeStart) + src; // line number fix
+            return sass.renderSync({
+                data: src,
+                indentedSyntax: true,
+                includePaths: [basedir],
+                outputStyle: 'compressed'
+            }).css;
+        } catch(e) {
+            throw new Error(e.formatted); // throw the proper message
+        }
+    };
+};
+
+})(module, require);
+```
+
+`js-processor.js`:
+
+```js
+(function(module, require) {
+const
+    path   = require('path'),
+    eslint = require('./eslintcli'); // check the implementation out before
+
+module.exports = JsProcessor;
+
+JsProcessor.onTranspileStart = function(file, nodes) { // onTranspileStart hook
+    const template = findNode('template');
+    if (!template) return;
+
+    const script = findNode('script');
+    if (!script) return;
+
+    const originalDst = template.attrs.dst;
+
+    script.$$templateUrl = isFile(originalDst)
+        ? originalDst
+        // ".posix" is necessary for proper separating
+        : path.posix.join(originalDst, getFileName(template.dst));
+
+    function findNode(name)    {return nodes.find(node => node.name === name);}
+    function isFile(file)      {return !!path.parse(file).ext;}
+    function getFileName(file) {return path.parse(file).base;}
+};
+
+function JsProcessor(scope = {}) {
+    return function jsProcessor(src) {
+        const
+            scp = Object.assign({}, scope, {TEMPLATE_URL: `'${this.$$templateUrl}'`}),
+            result = src.replace(/\$\$(\w+)\$\$/g, (match, id) => id in scp ? scp[id] : match);
+
+        eslint.validate(result, this.nodeStart);
+        return result;
+    };
+}
+
+})(module, require);
 ```
 
 ## Release History
