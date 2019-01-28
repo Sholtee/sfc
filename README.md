@@ -435,7 +435,7 @@ function JsProcessor(scope = {}) {
 - 0.0.6: User defined file extensions (`exts`) are now merged with the defaults
 - 0.0.7: 
   1. Fixed line ending issue
-  2. Processors context
+  2. Processor context
 - 0.0.8: Added `dstBase` option
 - 0.0.9: Added `onTranspileStart` and `onTranspileEnd` hooks
 - 0.0.10:
@@ -445,3 +445,6 @@ function JsProcessor(scope = {}) {
 - 0.0.12: Fixed missing grunt.template.process() call
 - 0.0.13: Added `quiet` option
 - 0.0.14: `onTranspileStart` and `onTranspileEnd` can be func[]
+- 0.0.15:
+  1. Sample processors
+  2. Empty nodes are skipped
