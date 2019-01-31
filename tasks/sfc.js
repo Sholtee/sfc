@@ -131,13 +131,14 @@ sfc.$parseNodes = function(input) {
             contentLines = countLinesTo(content.length, content);
 
         res.push({
-            name:         name,
-            attrs:        this.$parseAttributes(rawAttrs),
-            content:      content,
-            startIndex:   startIndex,
-            endIndex:     endIndex,
-            nodeStart:    nodeStart,
-            nodeEnd:      nodeEnd,
+            name,
+            content,
+            startIndex,
+            endIndex,
+            nodeStart,
+            nodeEnd,
+
+            attrs: this.$parseAttributes(rawAttrs),
             
             // ugly =(
             contentStart: nodeStart + (rawContent.slice(1) !== content.slice(1) ? 1 : 0),
