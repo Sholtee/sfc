@@ -28,7 +28,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         if (!quiet) log.write(`Processing file "${fileSrc}": `);
 
         var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).map(node => {
-            if (node.attrs.dst) node.dst = parseDst(node);
+            if ('dst' in node.attrs) node.dst = parseDst(node);
             return node;
         });
 
