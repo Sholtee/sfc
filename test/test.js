@@ -12,7 +12,8 @@ const
 
 grunt.initConfig({
     dirs: {
-        dst: 'dst'
+        dst: 'dst',
+        test: __dirname
     }
 });
 
@@ -149,26 +150,31 @@ test('context test [multi line]', t => {
 test('dstBase test', t => {
     const
         HTML = 'dst/test_no_base.html',
+        JS   = 'dst/test_no_base.js',
         CSS  = 'dst/my.css';
 
-    t.plan(4);
+    t.plan(6);
 
     sfc.$transpile(grunt, ['test_no_base.component'], {
         processors: {
             html: content => content,
-            css:  content => content
+            css:  content => content,
+            js:   content => content
         },
         dstBase: 'dst',
         quiet: true
     });
 
     t.ok(grunt.file.exists(HTML));
+    t.ok(grunt.file.exists(JS));
     t.ok(grunt.file.exists(CSS));
 
     t.equal(fs.readFileSync(HTML).toString(), '<div>\r\n  <b>kutya</b>\r\n</div>');
+    t.equal(fs.readFileSync(JS).toString(), 'console.log("cica");');
     t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
 
     grunt.file.delete(HTML);
+    grunt.file.delete(JS);
     grunt.file.delete(CSS);
 });
 

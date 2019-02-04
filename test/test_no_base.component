@@ -9,3 +9,8 @@
 <style processor="css" dst="my.css">
 div{display: none;}
 </style>
+
+<!-- Suppress "dstBase"! The output file should be "dst/test_no_base.js"-->
+<script processor="js" dst="<%= dirs.test %>/dst">
+console.log("cica");
+</script>
