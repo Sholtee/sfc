@@ -62,7 +62,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
                 ext:  exts[name.toLowerCase()]
             });
 
-            if (dstBase) dst = path.join(dstBase, dst);
+            if (dstBase && !path.isAbsolute(dst)) dst = path.join(dstBase, dst);
             return dst;
 
             function fileNameWithoutExtension(file) {return path.basename(file, path.extname(file));}
