@@ -24,7 +24,7 @@ Type: `string`
 
 Default: `undefined`
 
-The base folder of all the `dst` paths.
+The base folder of all the (relative) `dst` paths.
 
 #### exts (optional)
 Type: `object`
