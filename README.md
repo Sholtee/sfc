@@ -165,7 +165,7 @@ grunt.initConfig({
     1) At least the "processor" attribute must be set on each node 
     2) Without "dstBase" "dst" should be "<%= project.dirs.dist %>/views/"
     3) The output file will be named "dummy.html" (because "dst" is a folder)
-    4) Without "dst" the output of the processor will be treated as void
+    4) If "dst" is omitted the output of the processor will be treated as void
 -->
 <template processor="pug" dst="views/">
 .foo
@@ -448,3 +448,6 @@ function JsProcessor(scope = {}) {
 - 0.0.15:
   1. Sample processors
   2. Empty nodes are skipped
+- 0.0.16
+  1. You can suppress "dstBase" by using absolute path
+  2. Treat empty "dst" as a valid path
