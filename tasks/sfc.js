@@ -17,12 +17,17 @@ function sfc(grunt) {
     });
 }
 
-sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase, quiet, onTranspileStart, onTranspileEnd}) {
+sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
     exts = this.$mergeExts(exts, {
         template: '.html',
         script:   '.js',
         style:    '.css'
     });
+
+    if (!Array.isArray(onTranspileStart)) onTranspileStart = [onTranspileStart];
+    if (!Array.isArray(onTranspileEnd))   onTranspileEnd   = [onTranspileEnd];
+
+    processors = this.$mapProcessors(processors, onTranspileStart, onTranspileEnd);
 
     src.forEach(fileSrc => {
         if (!quiet) log.write(`Processing file "${fileSrc}": `);
@@ -32,7 +37,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             return node;
         });
 
-        callHook(onTranspileStart, fileSrc, nodes);
+        onTranspileStart.forEach(hook => hook(fileSrc, nodes));
 
         nodes = nodes.filter(node => {
             const process = processors[node.attrs.processor];
@@ -44,7 +49,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             return !!result;
         });
 
-        callHook(onTranspileEnd, fileSrc, nodes);
+        onTranspileEnd.forEach(hook => hook(fileSrc, nodes));
         
         if (!quiet) log.writeln(`${nodes.length} file(s) created`);
 
@@ -75,21 +80,25 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             function isFile(file) {return !!path.parse(file).ext;}
         }
     });
+};
 
-    function callHook(hook, ...args) {
-        switch (true) {
-            case typeof hook === 'function': {
-                call(hook);
-                break;
-            }
-            case Array.isArray(hook): {
-                hook.forEach(call);
-                break;
-            }
+sfc.$mapProcessors = function(processors, onTranspileStartHooks, onTranspileEndHooks) {
+    return Object.entries(processors).reduce((accu, [id, processor]) => {
+        if (typeof processor !== 'function') {
+            const {key, onTranspileStart, onTranspileEnd} = processor = require(id)(processor /*options*/);
+
+            id = key;
+
+            //
+            // TODO: ordered hooks
+            //
+            
+            if (onTranspileStart) onTranspileStartHooks.push(onTranspileStart);
+            if (onTranspileEnd)   onTranspileEndHooks.push(onTranspileEnd);
         }
 
-        function call(fn) {fn(...args);}
-    }
+        return Object.assign(accu, {[id]: processor});
+    }, {});
 };
 
 sfc.$mergeExts = function(src = {}, dst) {
