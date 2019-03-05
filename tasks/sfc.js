@@ -35,10 +35,12 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).map(node => {
             const {dst, processor} = node.attrs;
 
-            if (processor) node.processor = processors[processor];
-            if (dst) node.dst = parseDst(node);
+            if (isDefined(processor)) node.processor = processors[processor];
+            if (isDefined(dst))       node.dst       = parseDst(node);
 
             return node;
+
+            function isDefined(val) {return typeof val !== 'undefined';}
         });
 
         onTranspileStart.forEach(hook => hook(fileSrc, nodes));
@@ -56,7 +58,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         
         if (!quiet) log.writeln(`${nodes.length} file(s) created`);
 
-        function parseDst({name, processor: {ext}, attrs: {dst}}){
+        function parseDst({name, processor: {ext} = {}, attrs: {dst}}){
             dst = template.process(dst);
             
             //
