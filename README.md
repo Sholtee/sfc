@@ -1,5 +1,7 @@
 # grunt-single-file-component
 
+[![Build Status](https://travis-ci.org/Sholtee/sfc.svg?branch=master)](https://travis-ci.org/Sholtee/sfc)
+
 > A small grunt task which lets you keep all the assets of your component in a (custom) single file
 
 Inspired by VUE.
