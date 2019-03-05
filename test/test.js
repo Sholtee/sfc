@@ -147,6 +147,31 @@ test('context test [multi line]', t => {
     grunt.file.delete('dst');
 }));
 
+test('processor context test', t => {
+    t.plan(3);
+
+    const expectedContext = sfc.$parseNodes(fs.readFileSync('test.component').toString())[0];
+
+    var context;
+
+    sfc.$transpile(grunt, ['test.component'], {
+        processors: {
+            html: htmlProcessor
+        },
+        quiet: true
+    });
+
+    t.equal(context.processor, htmlProcessor);
+    delete context.processor;
+
+    t.equal(context.dst, 'dst\\test.html');
+    delete context.dst;
+
+    t.deepEqual(context, expectedContext);
+
+    function htmlProcessor() {context = this;} // ha nincs eredmeny akkor nem is irja ki a rendszer a fajlt
+});
+
 test('dstBase test', t => {
     const
         HTML = 'dst/test_no_base.html',
@@ -245,7 +270,7 @@ test('hook setting test', t => {
     sfc.$transpile(grunt, ['test.component'], {
         processors: {
             '../test/html-processor': {},
-            css:  content => content
+            css:  content => {}
         },
         dstBase: 'dst',
         onTranspileStart,
@@ -253,7 +278,5 @@ test('hook setting test', t => {
     });
 
     t.equal(onTranspileStart.length, 1);
-
-    grunt.file.delete('dst');
 });
 })(require);
