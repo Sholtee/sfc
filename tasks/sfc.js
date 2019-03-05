@@ -6,16 +6,18 @@
 'use strict';
 
 const
+    {template, file, log} = require('grunt'),
+
     fs   = require('fs'),
     path = require('path');
 
 module.exports = Object.assign(function sfc(grunt) {
     grunt.registerMultiTask('sfc', 'Single File Component', function() {
-        sfc.$transpile(grunt, this.filesSrc, this.options());
+        sfc.$transpile(this.filesSrc, this.options());
     });
 }, {
 
-$transpile: function({template, file, log}, src, {exts, processors, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
+$transpile: function(src, {exts, processors, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
     exts = this.$mergeExts(exts, {
         template: '.html',
         script:   '.js',
@@ -88,7 +90,7 @@ $transpile: function({template, file, log}, src, {exts, processors, dstBase, qui
 $mapProcessors: function(processors, onTranspileStartHooks, onTranspileEndHooks) {
     return Object.entries(processors).reduce((accu, [key, processor]) => {
         if (typeof processor !== 'function') {
-            const {id, onTranspileStart, onTranspileEnd} = processor = require(key)(processor /*options*/);
+            const {id, onTranspileStart, onTranspileEnd} = processor = require(template.process(key))(processor /*options*/);
 
             key = id;
 

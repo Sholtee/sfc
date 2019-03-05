@@ -130,7 +130,7 @@ test('context test [multi line]', t => {
 
     t.plan(4);
 
-    sfc.$transpile(grunt, ['test.component'], {
+    sfc.$transpile(['test.component'], {
         processors: {
             html: content => '<!-- cica -->' + content,
             css:  content => content
@@ -155,7 +155,7 @@ test('processor context test', t => {
 
     var context;
 
-    sfc.$transpile(grunt, ['test.component'], {
+    sfc.$transpile(['test.component'], {
         processors: {
             html: htmlProcessor
         },
@@ -181,7 +181,7 @@ test('dstBase test', t => {
 
     t.plan(6);
 
-    sfc.$transpile(grunt, ['test_no_base.component'], {
+    sfc.$transpile(['test_no_base.component'], {
         processors: {
             html: content => content,
             css:  content => content,
@@ -209,7 +209,7 @@ test('event firing test', t => {
 
     t.plan(12);
 
-    sfc.$transpile(grunt, ['test.component'], {
+    sfc.$transpile(['test.component'], {
         processors: {
             html: content => content
         },
@@ -268,7 +268,7 @@ test('hook setting test', t => {
 
     const onTranspileStart = [];
 
-    sfc.$transpile(grunt, ['test.component'], {
+    sfc.$transpile(['test.component'], {
         processors: {
             '../test/html-processor': {},
             css:  content => {}
