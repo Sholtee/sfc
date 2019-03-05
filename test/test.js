@@ -143,8 +143,7 @@ test('context test [multi line]', t => {
     t.equal(fs.readFileSync(HTML).toString(), '<!-- cica --><div>\r\n  <b>kutya</b>\r\n</div>');
     t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
 
-    grunt.file.delete(HTML);
-    grunt.file.delete(CSS);
+    grunt.file.delete('dst');
 }));
 
 test('dstBase test', t => {
@@ -173,9 +172,7 @@ test('dstBase test', t => {
     t.equal(fs.readFileSync(JS).toString(), 'console.log("cica");');
     t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
 
-    grunt.file.delete(HTML);
-    grunt.file.delete(JS);
-    grunt.file.delete(CSS);
+    grunt.file.delete('dst');
 });
 
 test('event firing test', t => {
@@ -215,6 +212,8 @@ test('event firing test', t => {
         }],
         quiet: true
     });
+
+    grunt.file.delete('dst');
 });
 
 test('processor querying test', t => {
@@ -239,10 +238,6 @@ test('processor querying test', t => {
 });
 
 test('hook setting test', t => {
-    const
-        HTML = 'dst/test.html',
-        CSS  = 'dst/my.css'; // test.component-ben meg van adva a fajlnev
-
     t.plan(1);
 
     const onTranspileStart = [];
@@ -259,7 +254,6 @@ test('hook setting test', t => {
 
     t.equal(onTranspileStart.length, 1);
 
-    grunt.file.delete(HTML);
-    grunt.file.delete(CSS);
+    grunt.file.delete('dst');
 });
 })(require);
