@@ -416,7 +416,7 @@ In this section you can see a set of sample processors. They are not intended to
 (function(module, require) {
 const pug = require('pug');
 
-module.exports = function pugProcessorFactory(basedir, scope) {
+module.exports = function pugProcessorFactory({basedir, scope}) {
     return Object.assign(function pugProcessor(src) {
         src = '\n'.repeat(this.nodeStart) + src; // line number fix
         return pug.compile(src, {basedir, pretty: true})(scope);
@@ -432,7 +432,7 @@ module.exports = function pugProcessorFactory(basedir, scope) {
 (function(module, require) {
 const sass = require('node-sass');
 
-module.exports = function sassProcessorFactory(basedir) {
+module.exports = function sassProcessorFactory({basedir}) {
     return Object.assign(function sassProcessor(src) {
         try {
             src = '\n'.repeat(this.nodeStart) + src; // line number fix
@@ -459,11 +459,13 @@ const
     path   = require('path'),
     eslint = require('./eslintcli'); // check the implementation out before
 
-module.exports = Object.assign(JsProcessor, {
-    id: 'js',
-    ext: '.js',
-    onTranspileStart
-});
+module.exports = function jsProcessorFactory() {
+    return Object.assign(jsProcessor, {
+        id: 'js',
+        ext: '.js',
+        onTranspileStart
+    });
+};
 
 function onTranspileStart(file, nodes) {
     const template = findNode('template');
@@ -484,7 +486,7 @@ function onTranspileStart(file, nodes) {
     function getFileName(file) {return path.parse(file).base;}
 };
 
-function JsProcessor(scope = {}) {
+function jsProcessor(scope = {}) {
     return function jsProcessor(src) {
         const
             scp = Object.assign({}, scope, {TEMPLATE_URL: `'${this.$$templateUrl}'`}),
