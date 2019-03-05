@@ -220,15 +220,15 @@ test('event firing test', t => {
 test('processor querying test', t => {
     const mapped = sfc.$mapProcessors({
         js: jsProcessor,
-        '../test/processor': {foo: 'bar'}
-    });
+        '../test/html-processor': {foo: 'bar'}
+    }, [], []);
 
     t.plan(6);
 
     t.equal(Object.keys(mapped).length, 2);
     t.equal(mapped.js, jsProcessor);
 
-    const factory = require('./processor');
+    const factory = require('./html-processor');
 
     t.equal(factory.__callCount, 1);
     t.ok(!!factory.__options);
@@ -236,5 +236,30 @@ test('processor querying test', t => {
     t.ok(typeof mapped.html === 'function');
 
     function jsProcessor(){}
+});
+
+test('hook setting test', t => {
+    const
+        HTML = 'dst/test.html',
+        CSS  = 'dst/my.css'; // test.component-ben meg van adva a fajlnev
+
+    t.plan(1);
+
+    const onTranspileStart = [];
+
+    sfc.$transpile(grunt, ['test.component'], {
+        processors: {
+            '../test/html-processor': {},
+            css:  content => content
+        },
+        dstBase: 'dst',
+        onTranspileStart,
+        quiet: true
+    });
+
+    t.equal(onTranspileStart.length, 1);
+
+    grunt.file.delete(HTML);
+    grunt.file.delete(CSS);
 });
 })(require);
