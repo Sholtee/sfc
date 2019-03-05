@@ -524,6 +524,7 @@ function jsProcessor(scope = {}) {
 - 0.0.15:
   1. Sample processors
   2. Empty nodes are skipped
-- 0.0.16
+- 0.0.16:
   1. You can suppress "dstBase" by using absolute path
   2. Treat empty "dst" as a valid path
+- 0.0.17: Processors can be queried
