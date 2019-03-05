@@ -216,4 +216,25 @@ test('event firing test', t => {
         quiet: true
     });
 });
+
+test('processor querying test', t => {
+    const mapped = sfc.$mapProcessors({
+        js: jsProcessor,
+        '../test/processor': {foo: 'bar'}
+    });
+
+    t.plan(6);
+
+    t.equal(Object.keys(mapped).length, 2);
+    t.equal(mapped.js, jsProcessor);
+
+    const factory = require('./processor');
+
+    t.equal(factory.__callCount, 1);
+    t.ok(!!factory.__options);
+    t.equal(factory.__options.foo, 'bar');
+    t.ok(typeof mapped.html === 'function');
+
+    function jsProcessor(){}
+});
 })(require);

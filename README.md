@@ -109,7 +109,7 @@ module.exports = function pugProcessorFactory({basedir, scope}) {
 
 ```js
 processors: {
-  './pug-processor': {basedir: '...', scope: {}}
+  'pug-processor': {basedir: '...', scope: {}}
 }
 ```
 
