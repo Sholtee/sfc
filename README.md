@@ -42,18 +42,81 @@ Defines the file extension for the output files if `dst` is a directory. Note
 - The object you passed will be merged with the defaults. 
 - Dot prefix can be omitted.
 
+*DEPRECATED* use `processor.ext` instead!
+
 #### processors
 Type: `object`
 
-Holds the processor functions in `{processorName: processorFunction}` form. During transpiling the content of each component node will be passed to the corresponding processor (identified by the `processor` attribute).
+Requires or defines processors. 
+
+##### About processors in general
+
+Basically processors are functions to do the transformation of the node content. During transpiling the content of each component node will be passed to the corresponding processor (identified by the `processor` attribute). 
+
 Processors have only one parameter:
 - content: The content of the current node to be transpiled
 - retVal: The transpiled content to be written out
 
-#### onTranspileStart (optional)
-Type: `Function | Function[]`
+They may have the following properties:
+- `id`: The unique id of the processor (e.g. "pug")
+- `ext`: The extension of the output file (e.g. ".html"). If presents it overrides the corresponding `exts` option.
+- `onTranspileStart`: An optional hook to be executed before the transpiling process (see below)
+- `onTranspileEnd`: An optional hook tobe executed after the transpiling process
 
-Default: `undefined`
+##### Defining processors
+
+You can define a processor by adding an entry to the `processors` object in the form of `id: processor`. In this case you can omit the `id` property.
+
+Example:
+
+```js
+processors: {
+  pug: require('pug').render 
+}
+```
+
+or 
+
+```js
+const renderPug = require('pug').render;
+.
+.
+.
+processors: {
+  pug: Object.assign(src => renderPug(src), {ext: 'html'}) 
+}
+```
+
+##### Requiring processors
+
+You can require a processor by adding an entry in the form of `idOrPathOfFactory: optionsObject`. In this case the system tries to load and execute the processor factory with the given options. Processor factory must return a processor function.
+
+Example:
+
+`pug-processor.js`:
+
+```js
+const pug = require('pug');
+
+module.exports = function pugProcessorFactory({basedir, scope}) {
+    return Object.assign(function pugProcessor(src) {
+        return pug.compile(src, {basedir, pretty: true})(scope);
+    }, {id: 'pug', ext: '.html'});
+};
+```
+
+`gruntfile.js`:
+
+```js
+processors: {
+  './pug-processor': {basedir: '...', scope: {}}
+}
+```
+
+#### onTranspileStart (optional)
+Type: `function | function[]`
+
+Default: `[]`
 
 Fired before transpiling with the following parameters:
 
@@ -61,9 +124,9 @@ Fired before transpiling with the following parameters:
 - nodesToProcess: The nodes about to processing
   
 #### onTranspileEnd (optional)
-Type: `Function | Function[]`
+Type: `function | function[]`
 
-Default: `undefined`
+Default: `[]`
 
 Fired after transpiling with the following parameters:
 
@@ -99,6 +162,11 @@ All the attributes (e.g. "dst") of the current node (including custom ones).
 Type: `string`
 
 The content of the current node.
+
+#### processor
+Type: `function`
+
+The processor currently being executed.
 
 #### startIndex
 Type: `int`
@@ -348,11 +416,11 @@ In this section you can see a set of sample processors. They are not intended to
 (function(module, require) {
 const pug = require('pug');
 
-module.exports = function PugProcessor(basedir, scope) {
-    return function pugProcessor(src) {
+module.exports = function pugProcessorFactory(basedir, scope) {
+    return Object.assign(function pugProcessor(src) {
         src = '\n'.repeat(this.nodeStart) + src; // line number fix
-        return pug.compile(src, {basedir: basedir, pretty: true})(scope);
-    };
+        return pug.compile(src, {basedir, pretty: true})(scope);
+    }, {id: 'pug', ext: '.html'});
 };
     
 })(module, require);
@@ -364,8 +432,8 @@ module.exports = function PugProcessor(basedir, scope) {
 (function(module, require) {
 const sass = require('node-sass');
 
-module.exports = function SassProcessor(basedir) {
-    return function sassProcessor(src) {
+module.exports = function sassProcessorFactory(basedir) {
+    return Object.assign(function sassProcessor(src) {
         try {
             src = '\n'.repeat(this.nodeStart) + src; // line number fix
             return sass.renderSync({
@@ -377,7 +445,7 @@ module.exports = function SassProcessor(basedir) {
         } catch(e) {
             throw new Error(e.formatted); // throw the proper message
         }
-    };
+    }, {id: 'sass', ext: '.css'});
 };
 
 })(module, require);
@@ -391,9 +459,13 @@ const
     path   = require('path'),
     eslint = require('./eslintcli'); // check the implementation out before
 
-module.exports = JsProcessor;
+module.exports = Object.assign(JsProcessor, {
+    id: 'js',
+    ext: '.js',
+    onTranspileStart
+});
 
-JsProcessor.onTranspileStart = function(file, nodes) { // onTranspileStart hook
+function onTranspileStart(file, nodes) {
     const template = findNode('template');
     if (!template) return;
 

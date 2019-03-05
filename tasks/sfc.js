@@ -33,18 +33,21 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         if (!quiet) log.write(`Processing file "${fileSrc}": `);
 
         var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).map(node => {
-            if ('dst' in node.attrs) node.dst = parseDst(node);
+            const {dst, processor} = node.attrs;
+
+            if (processor) node.processor = processors[processor];
+            if (dst) node.dst = parseDst(node);
+
             return node;
         });
 
         onTranspileStart.forEach(hook => hook(fileSrc, nodes));
 
-        nodes = nodes.filter(node => {
-            const process = processors[node.attrs.processor];
-            if (!process || !node.content) return false;
+        nodes = nodes.filter(function({processor, content, dst}) {
+            if (!processor || !content) return false;
 
-            const result = process.call(node, node.content);
-            if (result && node.dst) file.write(node.dst, result);
+            const result = processor.call(arguments[0], content);
+            if (result && dst) file.write(dst, result);
 
             return !!result;
         });
@@ -53,7 +56,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
         
         if (!quiet) log.writeln(`${nodes.length} file(s) created`);
 
-        function parseDst({name, attrs: {dst}}){
+        function parseDst({name, processor: {ext}, attrs: {dst}}){
             dst = template.process(dst);
             
             //
@@ -64,7 +67,7 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             if (!isFile(dst)) dst = path.format({
                 dir:  dst,
                 name: fileNameWithoutExtension(fileSrc),
-                ext:  exts[name.toLowerCase()]
+                ext:  ext || exts[name.toLowerCase()]
             });
 
             if (dstBase && !path.isAbsolute(dst)) dst = path.join(dstBase, dst);
@@ -83,11 +86,11 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
 };
 
 sfc.$mapProcessors = function(processors, onTranspileStartHooks, onTranspileEndHooks) {
-    return Object.entries(processors).reduce((accu, [id, processor]) => {
+    return Object.entries(processors).reduce((accu, [key, processor]) => {
         if (typeof processor !== 'function') {
-            const {key, onTranspileStart, onTranspileEnd} = processor = require(id)(processor /*options*/);
+            const {id, onTranspileStart, onTranspileEnd} = processor = require(key)(processor /*options*/);
 
-            id = key;
+            key = id;
 
             //
             // TODO: ordered hooks
@@ -97,7 +100,7 @@ sfc.$mapProcessors = function(processors, onTranspileStartHooks, onTranspileEndH
             if (onTranspileEnd)   onTranspileEndHooks.push(onTranspileEnd);
         }
 
-        return Object.assign(accu, {[id]: processor});
+        return Object.assign(accu, {[key]: processor});
     }, {});
 };
 
