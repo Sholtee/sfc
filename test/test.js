@@ -221,11 +221,11 @@ test('event firing test', t => {
             const [template, style] = nodes;
 
             t.equal(template.name, 'template');
-            t.equal(template.dst.replace('/', '\\'), HTML);
+            t.equal(template.dst.replace('/', path.sep), HTML);
             t.ok(!grunt.file.exists(HTML));
 
             t.equal(style.name, 'style');
-            t.equal(style.dst.replace('/', '\\'), CSS);
+            t.equal(style.dst.replace('/', path.sep), CSS);
             t.ok(!grunt.file.exists(CSS));
         },
         onTranspileEnd: [(file, nodes) => {
