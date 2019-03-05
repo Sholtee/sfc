@@ -245,7 +245,7 @@ test('event firing test', t => {
 test('processor querying test', t => {
     const mapped = sfc.$mapProcessors({
         js: jsProcessor,
-        '../test/html-processor': {foo: 'bar'}
+        '<%= dirs.test %>/html-processor': {foo: 'bar'}
     }, [], []);
 
     t.plan(6);
@@ -270,7 +270,7 @@ test('hook setting test', t => {
 
     sfc.$transpile(['test.component'], {
         processors: {
-            '../test/html-processor': {},
+            '<%= dirs.test %>/html-processor': {},
             css:  content => {}
         },
         dstBase: 'dst',
