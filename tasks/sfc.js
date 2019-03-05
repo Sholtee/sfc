@@ -9,15 +9,13 @@ const
     fs   = require('fs'),
     path = require('path');
 
-module.exports = sfc;
-
-function sfc(grunt) {
+module.exports = Object.assign(function sfc(grunt) {
     grunt.registerMultiTask('sfc', 'Single File Component', function() {
         sfc.$transpile(grunt, this.filesSrc, this.options());
     });
-}
+}, {
 
-sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
+$transpile: function({template, file, log}, src, {exts, processors, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
     exts = this.$mergeExts(exts, {
         template: '.html',
         script:   '.js',
@@ -85,9 +83,9 @@ sfc.$transpile = function({template, file, log}, src, {exts, processors, dstBase
             function isFile(file) {return !!path.parse(file).ext;}
         }
     });
-};
+},
 
-sfc.$mapProcessors = function(processors, onTranspileStartHooks, onTranspileEndHooks) {
+$mapProcessors: function(processors, onTranspileStartHooks, onTranspileEndHooks) {
     return Object.entries(processors).reduce((accu, [key, processor]) => {
         if (typeof processor !== 'function') {
             const {id, onTranspileStart, onTranspileEnd} = processor = require(key)(processor /*options*/);
@@ -104,17 +102,17 @@ sfc.$mapProcessors = function(processors, onTranspileStartHooks, onTranspileEndH
 
         return Object.assign(accu, {[key]: processor});
     }, {});
-};
+},
 
-sfc.$mergeExts = function(src = {}, dst) {
+$mergeExts: function(src = {}, dst) {
     return Object
         .keys(src)
         .reduce((dict, key) => Object.assign(dict, {
             [key]: `.${src[key].replace(/^\.+/, '')}`
         }), dst);
-};
+},
 
-sfc.$parseAttributes = function(input) {
+$parseAttributes: function(input) {
     const
         rex = /([\w-]+)(?:=("|')((?:(?!\2|\r\n|\n|\r).)*)\2)/g,
         res = {};
@@ -125,9 +123,9 @@ sfc.$parseAttributes = function(input) {
     }
 
     return res;
-};
+},
 
-sfc.$parseNodes = function(input) {
+$parseNodes: function(input) {
     const
         rex = /<([\w-]+)\b((?:[ \t]*[\w-]+(?:=("|')((?:(?!\3|\r\n|\n|\r).)*)\3))*)[\w \t-]*>([\s\S]*)<\/\1>$/gm,
         res = [];
@@ -165,5 +163,6 @@ sfc.$parseNodes = function(input) {
     function countLinesTo(end, str) {return str.substring(0, end).split(/\r\n|\n|\r/).length;}
 
     function strip(str) {return str.replace(/^(\r\n|\n|\r)|(\r\n|\n|\r)$/g, '');}
-};
+}
+});
 })(module, require);
