@@ -5,10 +5,11 @@
 (function(require){
 'use strict';
 const
-    sfc   = require('../tasks/sfc.js'),
-    grunt = require('grunt'),
+    {EOL} = require('os'),
     fs    = require('fs'),
-    test  = require('tape');
+    grunt = require('grunt'),
+    test  = require('tape'),
+    sfc   = require('../tasks/sfc.js');
 
 grunt.initConfig({
     dirs: {
@@ -31,9 +32,9 @@ test('single element parsing test', t => {
     t.plan(6);
 
     var ret = sfc.$parseNodes(
-        '<!--comment-->\n' +
-        '<cica-mica    attr-1="val"     attr-2="</cica-mica>" vmi>\n' +
-        'content\n' +
+        '<!--comment-->'                                            + EOL +
+        '<cica-mica    attr-1="val"     attr-2="</cica-mica>" vmi>' + EOL +
+        'content'                                                   + EOL +
         '</cica-mica>'
     );
 
@@ -52,11 +53,11 @@ test('multi element parsing test', t => {
     t.plan(11);
 
     const ret = sfc.$parseNodes(
-        '<!--\n' +
-        '    comment\n' +
-        '-->\n' +
-        '<dog attr1="val" attr2="kutya" vmi><dog></dog></dog>\n' +
-        '<kitty attr1="val" attr2="kutya" vmi><dog></dog></kitty>\n'
+        '<!--'                                                     + EOL +
+        '    comment'                                              + EOL +
+        '-->'                                                      + EOL +
+        '<dog attr1="val" attr2="kutya" vmi><dog></dog></dog>'     + EOL +
+        '<kitty attr1="val" attr2="kutya" vmi><dog></dog></kitty>' + EOL
     );
 
     t.equal(ret.length, 2);
@@ -74,9 +75,9 @@ test('empty element parsing test', t => {
     t.plan(4);
 
     var ret = sfc.$parseNodes(
-        '<!--\n' +
-        '    comment\n' +
-        '-->\n' +
+        '<!--'        + EOL +
+        '    comment' + EOL +
+        '-->'         + EOL +
         '<dog></dog>'
     );
 
@@ -92,7 +93,7 @@ test('context test [single line]', t => {
     t.plan(4);
 
     const ret = sfc.$parseNodes(
-        '<!--comment-->\n' +
+        '<!--comment-->' + EOL +
         '<cica-mica attr-1="val" attr-2="</cica-mica>" vmi>' +
         'content' +
         '</cica-mica>'
@@ -108,10 +109,10 @@ test('context test [multi line]', t => {
     t.plan(4);
 
     const ret = sfc.$parseNodes(
-        '<!--comment-->\n' +
-        '<cica-mica attr-1="val" attr-2="</cica-mica>" vmi>\n' +
-        '\n' +
-        'content\n' +
+        '<!--comment-->'                                     + EOL +
+        '<cica-mica attr-1="val" attr-2="</cica-mica>" vmi>' + EOL +
+                                                               EOL +
+        'content'                                            + EOL +
         '</cica-mica>'
     )[0];
 
@@ -140,7 +141,7 @@ test('context test [multi line]', t => {
     t.ok(grunt.file.exists(HTML));
     t.ok(grunt.file.exists(CSS));
 
-    t.equal(fs.readFileSync(HTML).toString(), '<!-- cica --><div>\r\n  <b>kutya</b>\r\n</div>');
+    t.equal(fs.readFileSync(HTML).toString(), `<!-- cica --><div>${EOL}  <b>kutya</b>${EOL}</div>`);
     t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
 
     grunt.file.delete('dst');
@@ -168,7 +169,7 @@ test('dstBase test', t => {
     t.ok(grunt.file.exists(JS));
     t.ok(grunt.file.exists(CSS));
 
-    t.equal(fs.readFileSync(HTML).toString(), '<div>\r\n  <b>kutya</b>\r\n</div>');
+    t.equal(fs.readFileSync(HTML).toString(), `<div>${EOL}  <b>kutya</b>${EOL}</div>`);
     t.equal(fs.readFileSync(JS).toString(), 'console.log("cica");');
     t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
 
