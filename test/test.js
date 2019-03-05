@@ -209,7 +209,6 @@ test('event firing test', t => {
             const [template] = nodes;
             t.equal(template.name, 'template');
             t.ok(grunt.file.exists(HTML));
-            grunt.file.delete(HTML);
         }],
         quiet: true
     });
