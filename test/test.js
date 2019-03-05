@@ -6,6 +6,7 @@
 'use strict';
 const
     {EOL} = require('os'),
+    path  = require('path'),
     fs    = require('fs'),
     grunt = require('grunt'),
     test  = require('tape'),
@@ -124,8 +125,8 @@ test('context test [multi line]', t => {
 
 [undefined, {}, {template: 'html', style: 'kutya'}, {template: '.html'}].forEach(exts => test(`transpiling test (exts: ${JSON.stringify(exts, null, 0)})`, t => {
     const
-        HTML = 'dst/test.html',
-        CSS  = 'dst/my.css'; // test.component-ben meg van adva a fajlnev
+        HTML = path.join('dst', 'test.html'),
+        CSS  = path.join('dst', 'my.css'); // test.component-ben meg van adva a fajlnev
 
     t.plan(4);
 
@@ -164,7 +165,7 @@ test('processor context test', t => {
     t.equal(context.processor, htmlProcessor);
     delete context.processor;
 
-    t.equal(context.dst, 'dst\\test.html');
+    t.equal(context.dst, path.join('dst', 'test.html'));
     delete context.dst;
 
     t.deepEqual(context, expectedContext);
@@ -174,9 +175,9 @@ test('processor context test', t => {
 
 test('dstBase test', t => {
     const
-        HTML = 'dst/test_no_base.html',
-        JS   = 'dst/test_no_base.js',
-        CSS  = 'dst/my.css';
+        HTML = path.join('dst', 'test_no_base.html'),
+        JS   = path.join('dst', 'test_no_base.js'),
+        CSS  = path.join('dst', 'my.css');
 
     t.plan(6);
 
@@ -203,8 +204,8 @@ test('dstBase test', t => {
 
 test('event firing test', t => {
     const
-        HTML = 'dst\\test.html',
-        CSS  = 'dst\\my.css';
+        HTML = path.join('dst', 'test.html'),
+        CSS  = path.join('dst', 'my.css');
 
     t.plan(12);
 
