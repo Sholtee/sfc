@@ -25,5 +25,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Sholtee/sfc.git"
+  },
+  "scripts": {
+    "test": "cd test && node test.js"
   }
 }
