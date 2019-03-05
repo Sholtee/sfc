@@ -461,43 +461,46 @@ const
     path   = require('path'),
     eslint = require('./eslintcli'); // check the implementation out before
 
-module.exports = function jsProcessorFactory() {
+module.exports = function jsProcessorFactory({scope = {}}) {
+    var templateUrl;
+
     return Object.assign(jsProcessor, {
         id: 'js',
         ext: '.js',
-        onTranspileStart
+        onTranspileStart,
+        onTranspileEnd
     });
-};
-
-function onTranspileStart(file, nodes) {
-    const template = findNode('template');
-    if (!template) return;
-
-    const script = findNode('script');
-    if (!script) return;
-
-    const originalDst = template.attrs.dst;
-
-    script.$$templateUrl = isFile(originalDst)
-        ? originalDst
-        // ".posix" is necessary for proper separating
-        : path.posix.join(originalDst, getFileName(template.dst));
-
-    function findNode(name)    {return nodes.find(node => node.name === name);}
-    function isFile(file)      {return !!path.parse(file).ext;}
-    function getFileName(file) {return path.parse(file).base;}
-};
-
-function jsProcessor(scope = {}) {
+    
     return function jsProcessor(src) {
         const
-            scp = Object.assign({}, scope, {TEMPLATE_URL: `'${this.$$templateUrl}'`}),
+            scp = Object.assign({}, scope, {TEMPLATE_URL: `'${templateUrl}'`}),
             result = src.replace(/\$\$(\w+)\$\$/g, (match, id) => id in scp ? scp[id] : match);
 
         eslint.validate(result, this.nodeStart);
         return result;
     };
-}
+
+    function onTranspileStart(file, nodes) {
+        const template = findNode('template');
+        if (!template) return;
+    
+        const script = findNode('script');
+        if (!script) return;
+    
+        const originalDst = template.attrs.dst;
+    
+        templateUrl = isFile(originalDst)
+            ? originalDst
+            // ".posix" is necessary for proper separating
+            : path.posix.join(originalDst, getFileName(template.dst));
+    
+        function findNode(name)    {return nodes.find(node => node.name === name);}
+        function isFile(file)      {return !!path.parse(file).ext;}
+        function getFileName(file) {return path.parse(file).base;}
+    };
+
+    function onTranspileEnd() {templateUrl = undefined;}
+};
 
 })(module, require);
 ```
