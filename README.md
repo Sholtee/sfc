@@ -471,14 +471,14 @@ module.exports = function jsProcessorFactory({scope = {}}) {
         onTranspileEnd
     });
     
-    return function jsProcessor(src) {
+    function jsProcessor(src) {
         const
             scp = Object.assign({}, scope, {TEMPLATE_URL: `'${templateUrl}'`}),
             result = src.replace(/\$\$(\w+)\$\$/g, (match, id) => id in scp ? scp[id] : match);
 
         eslint.validate(result, this.nodeStart);
         return result;
-    };
+    }
 
     function onTranspileStart(file, nodes) {
         const template = findNode('template');
