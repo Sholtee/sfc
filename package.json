@@ -1,7 +1,7 @@
 {
   "name": "grunt-single-file-component",
   "description": "Grunt Single File Component",
-  "version": "0.0.17c",
+  "version": "0.0.17d",
   "license": "MIT",
   "contributors": [
     {
