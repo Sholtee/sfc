@@ -466,7 +466,7 @@ module.exports = function jsProcessorFactory({scope = {}}) {
         id: 'js',
         ext: '.js',
         onTranspileStart
-    }, {id: 'js', ext: '.js'});
+    });
     
     function jsProcessor(src) {
         const
