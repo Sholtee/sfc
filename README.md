@@ -258,7 +258,7 @@ console.log('kerekesfacapa');
 In the following snippet we're using ESLint to validate `.js` files. Since the linter knows nothing about our component we have to fix the report line numbers manually:
 
 ```js
-const eslint = new ESLintCli(require('eslint'));
+const eslint = new ESLintCLI(require('eslint'));
 .
 .
 .
@@ -283,7 +283,7 @@ grunt.initConfig({
 .
 .
 .
-function ESLintCli({CLIEngine}){
+function ESLintCLI({CLIEngine}){
     const
         engine = new CLIEngine({
             outputFile:  false,
@@ -321,7 +321,7 @@ grunt.initConfig({
                 processors: {
                     js: function(content){
                         // "%%TEMPLATE_URL%%" will act as a magic constant in your script
-                        return content.replace(/%%TEMPLATE_URL%%/g, `'${this.$$templateUrl}'`);
+                        return content.replace(/%%TEMPLATE_URL%%/g, `'${this.templateUrl}'`);
                     },
                     .
                     .
@@ -334,16 +334,16 @@ grunt.initConfig({
                     const script = findNode('script');
                     if (!script) return;
                     
-                    const originalDst = template.attrs.dst;
+                    const {dst, attrs: {dst: originalDst}} = template;
                     
-                    script.$$templateUrl = isFile(originalDst)
+                    script.templateUrl = isFile(originalDst)
                         ? originalDst
                         // ".posix" is necessary for proper separating
-                        : path.posix.join(originalDst, getFileName(template.dst));
+                        : path.posix.join(originalDst, getFileName(dst));
                     
-                    function isFile(file) {return !!path.parse(file).ext;}
+                    function isFile(file)      {return !!path.parse(file).ext;}
                     function getFileName(file) {return path.parse(file).base;}
-                    function findNode(name) {return nodes.find(node => node.name === name);}
+                    function findNode(name)    {return nodes.find(node => node.name === name);}
                 }
             }
         }
@@ -385,7 +385,7 @@ grunt.initConfig({
                 processors: {
                     pug: require('pug').render,
                     js: function(content){
-                        const template = grunt.file.read(this.$$templatePath);
+                        const template = grunt.file.read(this.templatePath);
                         return content.replace('%%TEMPLATE%%', `'${template}'`);;
                     },
                     .
@@ -399,7 +399,7 @@ grunt.initConfig({
                     const script = findNode('script');
                     if (!script) return;
                     
-                    script.$$templatePath = template.dst;
+                    script.templatePath = template.dst;
                     
                     function findNode(name) {return nodes.find(node => node.name === name);}
                 }
@@ -462,18 +462,15 @@ const
     eslint = require('./eslintcli'); // check the implementation out before
 
 module.exports = function jsProcessorFactory({scope = {}}) {
-    var templateUrl;
-
     return Object.assign(jsProcessor, {
         id: 'js',
         ext: '.js',
-        onTranspileStart,
-        onTranspileEnd
-    });
+        onTranspileStart
+    }, {id: 'js', ext: '.js'});
     
     function jsProcessor(src) {
         const
-            scp = Object.assign({}, scope, {TEMPLATE_URL: `'${templateUrl}'`}),
+            scp = Object.assign({}, scope, {TEMPLATE_URL: `'${this.templateUrl}'`}),
             result = src.replace(/\$\$(\w+)\$\$/g, (match, id) => id in scp ? scp[id] : match);
 
         eslint.validate(result, this.nodeStart);
@@ -487,19 +484,17 @@ module.exports = function jsProcessorFactory({scope = {}}) {
         const script = findNode('script');
         if (!script) return;
     
-        const originalDst = template.attrs.dst;
+        const {dst, attrs: {dst: originalDst}} = template;
     
-        templateUrl = isFile(originalDst)
+        script.templateUrl = isFile(originalDst)
             ? originalDst
             // ".posix" is necessary for proper separating
-            : path.posix.join(originalDst, getFileName(template.dst));
+            : path.posix.join(originalDst, getFileName(dst));
     
         function findNode(name)    {return nodes.find(node => node.name === name);}
         function isFile(file)      {return !!path.parse(file).ext;}
         function getFileName(file) {return path.parse(file).base;}
-    };
-
-    function onTranspileEnd() {templateUrl = undefined;}
+    }
 };
 
 })(module, require);
@@ -528,6 +523,6 @@ module.exports = function jsProcessorFactory({scope = {}}) {
   1. Sample processors
   2. Empty nodes are skipped
 - 0.0.16:
-  1. You can suppress "dstBase" by using absolute path
-  2. Treat empty "dst" as a valid path
+  1. You can suppress `dstBase` by using absolute path
+  2. Treat empty `dst` as a valid path
 - 0.0.17: Processors can be queried
