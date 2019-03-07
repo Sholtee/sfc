@@ -6,13 +6,13 @@
 'use strict';
 
 const
-    {template, file, log} = require('grunt'),
+    {registerMultiTask, template, file, log} = require('grunt'),
 
     fs   = require('fs'),
     path = require('path');
 
-module.exports = Object.assign(function sfc(grunt) {
-    grunt.registerMultiTask('sfc', 'Single File Component', function() {
+module.exports = Object.assign(function sfc() {
+    registerMultiTask('sfc', 'Single File Component', function() {
         sfc.$transpile(this.filesSrc, this.options());
     });
 }, {
