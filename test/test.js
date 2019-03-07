@@ -280,4 +280,12 @@ test('hook setting test', t => {
 
     t.equal(onTranspileStart.length, 1);
 });
+
+test('task registration test', t => {
+    t.plan(1);
+
+    sfc();
+
+    t.ok('sfc' in grunt.task._tasks);
+});
 })(require);
