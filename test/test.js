@@ -282,10 +282,10 @@ test('hook setting test', t => {
 });
 
 test('task registration test', t => {
-    t.plan(1);
+    t.plan(2);
 
+    t.ok(!('sfc' in grunt.task._tasks));
     sfc();
-
     t.ok('sfc' in grunt.task._tasks);
 });
 })(require);
