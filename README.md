@@ -320,8 +320,8 @@ grunt.initConfig({
             options: {
                 processors: {
                     js: function(content){
-                        // "%%TEMPLATE_URL%%" will act as a magic constant in your script
-                        return content.replace(/%%TEMPLATE_URL%%/g, `'${this.templateUrl}'`);
+                        // "$$TEMPLATE_URL$$" will act as a magic constant in your script
+                        return content.replace(/$$TEMPLATE_URL$$/g, `'${this.templateUrl}'`);
                     },
                     .
                     .
@@ -367,7 +367,7 @@ For example in AngularJS the template can be included in the js file. To achieve
 </template>
 
 <script processor="js" dst="<%= project.dirs.dist %>/scripts/">
-console.log(%%TEMPLATE%%);
+console.log($$TEMPLATE$$);
 </script>
 .
 .
@@ -386,7 +386,7 @@ grunt.initConfig({
                     pug: require('pug').render,
                     js: function(content){
                         const template = grunt.file.read(this.templatePath);
-                        return content.replace('%%TEMPLATE%%', `'${template}'`);;
+                        return content.replace('$$TEMPLATE$$', `'${template}'`);;
                     },
                     .
                     .
