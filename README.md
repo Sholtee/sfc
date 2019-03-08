@@ -85,7 +85,7 @@ const renderPug = require('pug').render;
 .
 .
 processors: {
-  pug: Object.assign(src => renderPug(src), {ext: 'html'}) 
+  pug: Object.assign(src => renderPug(src), {ext: '.html'}) 
 }
 ```
 
@@ -526,3 +526,4 @@ module.exports = function jsProcessorFactory({scope = {}}) {
   1. You can suppress `dstBase` by using absolute path
   2. Treat empty `dst` as a valid path
 - 0.0.17: Processors can be queried
+- 0.0.18: Small refactor
