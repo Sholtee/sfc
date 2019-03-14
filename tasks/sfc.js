@@ -6,11 +6,13 @@
 (function(module, require) {
 const
     {registerMultiTask, template, file, log} = require('grunt'),
-    {EOL} = require('os'),
-    {forEachAsync, filterAsync} = require('../lib/utils'),
 
-    fs   = require('fs'),
-    path = require('path');
+    {forEachAsync, filterAsync} = require('../lib/utils'),
+    {parseNodes} = require('../lib/parser'),
+
+    {EOL} = require('os'),
+    fs    = require('fs'),
+    path  = require('path');
 
 module.exports = Object.assign(function sfc() {
     registerMultiTask('sfc', 'Single File Component', async function() {
@@ -39,7 +41,7 @@ $transpile: async function(src, {exts = {}, processors = {}, dstBase, quiet, onT
     await forEachAsync(src, async fileSrc => {
         if (!quiet) log.write(`Processing file "${fileSrc}": `);
 
-        var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).filter(node => {
+        var nodes = parseNodes(fs.readFileSync(fileSrc).toString()).filter(node => {
             const {dst, processor} = node.attrs;
 
             if (isDefined(processor)) {
@@ -150,59 +152,6 @@ $mergeExts: function(src, dst) {
         .reduce((dict, key) => Object.assign(dict, {
             [key]: `.${src[key].replace(/^\.+/, '')}`
         }), dst);
-},
-
-$parseAttributes: function(input) {
-    const
-        rex = /([\w-]+)(?:=("|')((?:(?!\2|\r\n|\n|\r).)*)\2)/g,
-        res = {};
-
-    for (var ar; (ar = rex.exec(input)) != null;) {
-        const [, key, , value] = ar;
-        res[key] = value;
-    }
-
-    return res;
-},
-
-$parseNodes: function(input) {
-    const
-        rex = /<([\w-]+)\b((?:[ \t]*[\w-]+(?:=("|')((?:(?!\3|\r\n|\n|\r).)*)\3))*)[\w \t-]*>([\s\S]*)<\/\1>$/gm,
-        res = [];
-
-    for (var ar; (ar = rex.exec(input)) != null;) {
-        const
-            [, name, rawAttrs, , , rawContent] = ar,
-
-            startIndex   = ar.index,
-            endIndex     = rex.lastIndex,
-            content      = strip(rawContent),
-
-            nodeStart    = countLinesTo(startIndex, input),
-            nodeEnd      = countLinesTo(endIndex + 1, input),
-            contentLines = countLinesTo(content.length, content);
-
-        res.push({
-            name,
-            content,
-            startIndex,
-            endIndex,
-            nodeStart,
-            nodeEnd,
-
-            attrs: this.$parseAttributes(rawAttrs),
-
-            // ugly =(
-            contentStart: nodeStart + (rawContent.slice(1) !== content.slice(1) ? 1 : 0),
-            contentEnd:   nodeStart + contentLines - (rawContent.slice(-1) !== content.slice(-1) ? 0 : 1)
-        });
-    }
-
-    return res;
-
-    function countLinesTo(end, str) {return str.substring(0, end).split(/\r\n|\n|\r/).length;}
-
-    function strip(str) {return str.replace(/^(\r\n|\n|\r)|(\r\n|\n|\r)$/g, '');}
 }
 });
 })(module, require);
