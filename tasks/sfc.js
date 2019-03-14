@@ -7,6 +7,7 @@
 
 const
     {registerMultiTask, template, file, log} = require('grunt'),
+    {EOL} = require('os'),
 
     fs   = require('fs'),
     path = require('path');
@@ -17,7 +18,7 @@ module.exports = Object.assign(function sfc() {
     });
 }, {
 
-$transpile: function(src, {exts, processors, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
+$transpile: function(src, {exts = {}, processors = {}, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
     exts = this.$mergeExts(exts, {
         template: '.html',
         script:   '.js',
@@ -32,11 +33,21 @@ $transpile: function(src, {exts, processors, dstBase, quiet, onTranspileStart = 
     src.forEach(fileSrc => {
         if (!quiet) log.write(`Processing file "${fileSrc}": `);
 
-        var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).map(node => {
+        var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).filter(node => {
             const {dst, processor} = node.attrs;
 
-            if (isDefined(processor)) node.processor = processors[processor];
-            if (isDefined(dst))       node.dst       = parseDst(node);
+            if (isDefined(processor)) {
+                node.processor = processors[processor];
+
+                if (!node.processor) {
+                    if (!quiet) log.writeln(`${EOL}"${node.name}" references undefined processor.`);
+                    return false;
+                }
+            }
+
+            if (isDefined(dst)) {
+                node.dst = parseDst(node);
+            }
 
             return node;
 
@@ -46,12 +57,25 @@ $transpile: function(src, {exts, processors, dstBase, quiet, onTranspileStart = 
         onTranspileStart.forEach(hook => hook(fileSrc, nodes));
 
         nodes = nodes.filter(function({processor, content, dst}) {
-            if (!processor || !content) return false;
+            //
+            // 1) Ha nincs processzor akkor az eredeti tartalmat irjuk ki.
+            // 2) A processzor akkor is keruljon meghivasra ha nincs "dst".
+            //
 
-            const result = processor.call(arguments[0], content);
-            if (result && dst) file.write(dst, result);
+            if (processor) content = processor.call(arguments[0], content);
 
-            return !!result;
+            if (!content) {
+                if (!quiet) log.writeln(`"${node.name}" has no content to be written out`);
+                return false;
+            }
+
+            if (!dst) {
+                if (!quiet) log.writeln(`"${node.name}" has no target file (dst)`);
+                return false;
+            }
+
+            file.write(dst, content);
+            return true;
         });
 
         onTranspileEnd.forEach(hook => hook(fileSrc, nodes));
@@ -106,7 +130,7 @@ $mapProcessors: function(processors, onTranspileStartHooks, onTranspileEndHooks)
     }, {});
 },
 
-$mergeExts: function(src = {}, dst) {
+$mergeExts: function(src, dst) {
     return Object
         .keys(src)
         .reduce((dict, key) => Object.assign(dict, {

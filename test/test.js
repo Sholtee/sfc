@@ -148,6 +148,19 @@ test('context test [multi line]', t => {
     grunt.file.delete('dst');
 }));
 
+test('transpiling test (no processor)', t => {
+    const HTML = path.join('dst', 'test_no_processor.html');
+
+    t.plan(2);
+
+    sfc.$transpile(['test_no_processor.component'], {quiet: true});
+
+    t.ok(grunt.file.exists(HTML));
+    t.equal(fs.readFileSync(HTML).toString(), `<div>${EOL}  <b>kutya</b>${EOL}</div>`);
+
+    grunt.file.delete('dst');
+});
+
 test('processor context test', t => {
     t.plan(3);
 
@@ -203,30 +216,25 @@ test('dstBase test', t => {
 });
 
 test('event firing test', t => {
-    const
-        HTML = path.join('dst', 'test.html'),
-        CSS  = path.join('dst', 'my.css');
+    const HTML = path.join('dst', 'test.html');
 
-    t.plan(12);
+    t.plan(9);
 
     sfc.$transpile(['test.component'], {
         processors: {
             html: content => content
+            // nincs css processor
         },
         exts: {},
         onTranspileStart: (file, nodes) => {
             t.equal(file, 'test.component');
-            t.equal(nodes.length, 2);
+            t.equal(nodes.length, 1);
 
-            const [template, style] = nodes;
+            const [template] = nodes;
 
             t.equal(template.name, 'template');
             t.equal(template.dst.replace('/', path.sep), HTML);
             t.ok(!grunt.file.exists(HTML));
-
-            t.equal(style.name, 'style');
-            t.equal(style.dst.replace('/', path.sep), CSS);
-            t.ok(!grunt.file.exists(CSS));
         },
         onTranspileEnd: [(file, nodes) => {
             t.equal(file, 'test.component');

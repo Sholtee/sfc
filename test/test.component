@@ -5,7 +5,7 @@
 </div>
 </template>
 
-<!-- Output file should be "dst/my.css"-->
+<!-- Suppress "dstBase" && default output file name! Output file should be "dst/my.css" -->
 <style processor="css" dst="<%= dirs.dst %>/my.css">
 div{display: none;}
 </style>
