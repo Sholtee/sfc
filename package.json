@@ -28,7 +28,7 @@
     "url": "git+https://github.com/Sholtee/sfc.git"
   },
   "scripts": {
-    "pretest_win": "eslint --config eslint.json --rule linebreak-style:[windows,unix] tasks/*.js",
+    "pretest_win": "eslint --config eslint.json --rule linebreak-style:[warn,windows] tasks/*.js",
     "pretest_unix": "eslint --config eslint.json --rule linebreak-style:[warn,unix] tasks/*.js",
     "test": "cd test && node test.js"
   }
