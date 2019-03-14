@@ -14,6 +14,7 @@
     "grunt": "^1.0.2",
     "eslint": "^5.15.1",
     "tape": "^4.9.1",
+    "tape-promise": "^4.0.0",
     "run-script-os": "^1.0.5"
   },
   "engines": {
@@ -30,9 +31,8 @@
   },
   "scripts": {
     "lint": "run-script-os",
-    "lint:win32": "eslint --config eslint.json --rule linebreak-style:[warn,windows] tasks/*.js",
-    "lint:linux": "eslint --config eslint.json --rule linebreak-style:[warn,unix] tasks/*.js",
-
+    "lint:win32": "eslint --config eslint.json --rule linebreak-style:[warn,windows] tasks/*.js  lib/*.js",
+    "lint:linux": "eslint --config eslint.json --rule linebreak-style:[warn,unix] tasks/*.js  lib/*.js",
     "pretest": "npm run lint",
     "test": "cd test && node test.js"
   }

@@ -9,8 +9,8 @@ const
     path  = require('path'),
     fs    = require('fs'),
     grunt = require('grunt'),
-    test  = require('tape'),
-    sfc   = require('../tasks/sfc.js');
+    test  = require('tape-promise').default(require('tape')),
+    sfc   = require('../tasks/sfc');
 
 grunt.initConfig({
     dirs: {
@@ -123,14 +123,14 @@ test('context test [multi line]', t => {
     t.equal(ret.contentEnd, 4);
 });
 
-[undefined, {}, {template: 'html', style: 'kutya'}, {template: '.html'}].forEach(exts => test(`transpiling test (exts: ${JSON.stringify(exts, null, 0)})`, t => {
+[undefined, {}, {template: 'html', style: 'kutya'}, {template: '.html'}].forEach(exts => test(`transpiling test (exts: ${JSON.stringify(exts, null, 0)})`, async t => {
     const
         HTML = path.join('dst', 'test.html'),
         CSS  = path.join('dst', 'my.css'); // test.component-ben meg van adva a fajlnev
 
     t.plan(4);
 
-    sfc.$transpile(['test.component'], {
+    await sfc.$transpile(['test.component'], {
         processors: {
             html: content => '<!-- cica -->' + content,
             css:  content => content
@@ -148,12 +148,12 @@ test('context test [multi line]', t => {
     grunt.file.delete('dst');
 }));
 
-test('transpiling test (no processor)', t => {
+test('transpiling test (no processor)', async t => {
     const HTML = path.join('dst', 'test_no_processor.html');
 
     t.plan(2);
 
-    sfc.$transpile(['test_no_processor.component'], {quiet: true});
+    await sfc.$transpile(['test_no_processor.component'], {quiet: true});
 
     t.ok(grunt.file.exists(HTML));
     t.equal(fs.readFileSync(HTML).toString(), `<div>${EOL}  <b>kutya</b>${EOL}</div>`);
@@ -161,14 +161,14 @@ test('transpiling test (no processor)', t => {
     grunt.file.delete('dst');
 });
 
-test('processor context test', t => {
+test('processor context test', async t => {
     t.plan(3);
 
     const expectedContext = sfc.$parseNodes(fs.readFileSync('test.component').toString())[0];
 
     var context;
 
-    sfc.$transpile(['test.component'], {
+    await sfc.$transpile(['test.component'], {
         processors: {
             html: htmlProcessor
         },
@@ -186,7 +186,7 @@ test('processor context test', t => {
     function htmlProcessor() {context = this;} // ha nincs eredmeny akkor nem is irja ki a rendszer a fajlt
 });
 
-test('dstBase test', t => {
+test('dstBase test', async t => {
     const
         HTML = path.join('dst', 'test_no_base.html'),
         JS   = path.join('dst', 'test_no_base.js'),
@@ -194,7 +194,7 @@ test('dstBase test', t => {
 
     t.plan(6);
 
-    sfc.$transpile(['test_no_base.component'], {
+    await sfc.$transpile(['test_no_base.component'], {
         processors: {
             html: content => content,
             css:  content => content,
@@ -215,12 +215,12 @@ test('dstBase test', t => {
     grunt.file.delete('dst');
 });
 
-test('event firing test', t => {
+test('event firing test', async t => {
     const HTML = path.join('dst', 'test.html');
 
     t.plan(9);
 
-    sfc.$transpile(['test.component'], {
+    await sfc.$transpile(['test.component'], {
         processors: {
             html: content => content
             // nincs css processor
@@ -271,12 +271,12 @@ test('processor querying test', t => {
     function jsProcessor(){}
 });
 
-test('hook setting test', t => {
+test('hook setting test', async t => {
     t.plan(1);
 
     const onTranspileStart = [];
 
-    sfc.$transpile(['test.component'], {
+    await sfc.$transpile(['test.component'], {
         processors: {
             '<%= dirs.test %>/html-processor': {},
             css:  content => {}

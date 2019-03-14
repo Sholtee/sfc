@@ -7,18 +7,24 @@
 const
     {registerMultiTask, template, file, log} = require('grunt'),
     {EOL} = require('os'),
+    {forEachAsync, filterAsync} = require('../lib/utils'),
 
     fs   = require('fs'),
     path = require('path');
 
 module.exports = Object.assign(function sfc() {
-    registerMultiTask('sfc', 'Single File Component', function() {
-        // eslint-disable-next-line no-invalid-this
-        sfc.$transpile(this.filesSrc, this.options());
+    registerMultiTask('sfc', 'Single File Component', async function() {
+        /* eslint-disable no-invalid-this */
+        const done = this.async();
+
+        await sfc.$transpile(this.filesSrc, this.options());
+        /* eslint-enable no-invalid-this */
+
+        done();
     });
 }, {
 
-$transpile: function(src, {exts = {}, processors = {}, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
+$transpile: async function(src, {exts = {}, processors = {}, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
     exts = this.$mergeExts(exts, {
         template: '.html',
         script:   '.js',
@@ -30,7 +36,7 @@ $transpile: function(src, {exts = {}, processors = {}, dstBase, quiet, onTranspi
 
     processors = this.$mapProcessors(processors, onTranspileStart, onTranspileEnd);
 
-    src.forEach(fileSrc => {
+    await forEachAsync(src, async fileSrc => {
         if (!quiet) log.write(`Processing file "${fileSrc}": `);
 
         var nodes = this.$parseNodes(fs.readFileSync(fileSrc).toString()).filter(node => {
@@ -56,13 +62,21 @@ $transpile: function(src, {exts = {}, processors = {}, dstBase, quiet, onTranspi
 
         onTranspileStart.forEach(hook => hook(fileSrc, nodes));
 
-        nodes = nodes.filter(function({name, processor, content, dst}) {
+        nodes = await filterAsync(nodes, async function({name, processor, content, dst}) {
             //
             // 1) Ha nincs processzor akkor az eredeti tartalmat irjuk ki.
-            // 2) A processzor akkor is keruljon meghivasra ha nincs "dst".
+            // 2) A processzor akkor is meghivasra kerul ha nincs "dst".
             //
 
-            if (processor) content = processor.call(arguments[0], content);
+            if (processor) {
+                content = processor.call(arguments[0], content);
+
+                //
+                // Processzor lehet async.
+                //
+
+                if (content instanceof Promise) content = await content;
+            }
 
             if (!content) {
                 if (!quiet) log.writeln(`"${name}" has no content to be written out`);
