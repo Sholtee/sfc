@@ -2,8 +2,7 @@
 
 > A small grunt task which lets you keep all the assets of your component in a (custom) single file
 
-[![NPM][grunt-single-file-component-icon] ][grunt-single-file-component-url]
-
+[![NPM](https://nodei.co/npm/grunt-single-file-component.png)](https://nodei.co/npm/grunt-single-file-component/)
 [![Build Status](https://travis-ci.org/Sholtee/sfc.svg?branch=master)](https://travis-ci.org/Sholtee/sfc)
 
 Inspired by VUE.
