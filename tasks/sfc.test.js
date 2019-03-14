@@ -1,38 +1,45 @@
 /********************************************************************************
- *  test.js                                                                      *
- *  Author: Denes Solti                                                          *
- ********************************************************************************/
-(function(require){
+*  sfc.test.js                                                                  *
+*  Author: Denes Solti                                                          *
+********************************************************************************/
 'use strict';
+
+(function(require) {
 const
     {EOL} = require('os'),
+    {parseNodes} = require('../lib/parser'),
+
     path  = require('path'),
     fs    = require('fs'),
     grunt = require('grunt'),
     test  = require('tape-promise').default(require('tape')),
-    {parseNodes} = require('../lib/parser'),
-    sfc   = require('../tasks/sfc');
+    sfc   = require('./sfc'),
+
+    CWD = require('process').cwd(),
+    TEST_BASE = path.join(CWD, 'test'),
+    DST_BASE  = path.join(TEST_BASE, 'dst');
 
 grunt.initConfig({
     dirs: {
-        dst: 'dst',
-        test: __dirname
+        dst:  DST_BASE,
+        test: TEST_BASE
     }
 });
 
 [undefined, {}, {template: 'html', style: 'kutya'}, {template: '.html'}].forEach(exts => test(`transpiling test (exts: ${JSON.stringify(exts, null, 0)})`, async t => {
     const
-        HTML = path.join('dst', 'test.html'),
-        CSS  = path.join('dst', 'my.css'); // test.component-ben meg van adva a fajlnev
+        HTML = path.join(DST_BASE, 'test.html'),
+        CSS  = path.join(DST_BASE, 'my.css'); // test.component-ben meg van adva a fajlnev
 
     t.plan(4);
 
-    await sfc.$transpile(['test.component'], {
+    await sfc.$transpile([path.join(TEST_BASE, 'test.component')], {
         processors: {
             html: content => '<!-- cica -->' + content,
             css:  content => content
         },
         exts: exts,
+        dstBase: TEST_BASE,
         quiet: true
     });
 
@@ -42,34 +49,35 @@ grunt.initConfig({
     t.equal(fs.readFileSync(HTML).toString(), `<!-- cica --><div>${EOL}  <b>kutya</b>${EOL}</div>`);
     t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
 
-    grunt.file.delete('dst');
+    grunt.file.delete(DST_BASE);
 }));
 
 test('transpiling test (no processor)', async t => {
-    const HTML = path.join('dst', 'test_no_processor.html');
+    const HTML = path.join(DST_BASE, 'test_no_processor.html');
 
     t.plan(2);
 
-    await sfc.$transpile(['test_no_processor.component'], {quiet: true});
+    await sfc.$transpile([path.join(TEST_BASE, 'test_no_processor.component')], {dstBase: TEST_BASE, quiet: true});
 
     t.ok(grunt.file.exists(HTML));
     t.equal(fs.readFileSync(HTML).toString(), `<div>${EOL}  <b>kutya</b>${EOL}</div>`);
 
-    grunt.file.delete('dst');
+    grunt.file.delete(DST_BASE);
 });
 
 test('transpiling test (async processor)', async t => {
     const
-        HTML = path.join('dst', 'test.html'),
-        CSS  = path.join('dst', 'my.css');
+        HTML = path.join(DST_BASE, 'test.html'),
+        CSS  = path.join(DST_BASE, 'my.css');
 
     t.plan(4);
 
-    await sfc.$transpile(['test.component'], {
+    await sfc.$transpile([path.join(TEST_BASE, 'test.component')], {
         processors: {
             html: content => new Promise(resolve => setTimeout(resolve('<!-- cica -->' + content), 10)), // async
             css:  content => content
         },
+        dstBase: TEST_BASE,
         quiet: true
     });
 
@@ -79,76 +87,51 @@ test('transpiling test (async processor)', async t => {
     t.equal(fs.readFileSync(HTML).toString(), `<!-- cica --><div>${EOL}  <b>kutya</b>${EOL}</div>`);
     t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
 
-    grunt.file.delete('dst');
+    grunt.file.delete(DST_BASE);
 });
 
 test('processor context test', async t => {
     t.plan(3);
 
-    const expectedContext = parseNodes(fs.readFileSync('test.component').toString())[0];
+    const expectedContext = parseNodes(fs.readFileSync(path.join(TEST_BASE, 'test.component')).toString())[0];
 
     var context;
 
-    await sfc.$transpile(['test.component'], {
+    await sfc.$transpile([path.join(TEST_BASE, 'test.component')], {
         processors: {
             html: htmlProcessor
         },
+        dstBase: TEST_BASE,
         quiet: true
     });
 
     t.equal(context.processor, htmlProcessor);
     delete context.processor;
 
-    t.equal(context.dst, path.join('dst', 'test.html'));
+    t.equal(context.dst, path.join(DST_BASE, 'test.html'));
     delete context.dst;
 
     t.deepEqual(context, expectedContext);
 
+    // eslint-disable-next-line no-invalid-this
     function htmlProcessor() {context = this;} // ha nincs eredmeny akkor nem is irja ki a rendszer a fajlt
 });
 
-test('dstBase test', async t => {
-    const
-        HTML = path.join('dst', 'test_no_base.html'),
-        JS   = path.join('dst', 'test_no_base.js'),
-        CSS  = path.join('dst', 'my.css');
-
-    t.plan(6);
-
-    await sfc.$transpile(['test_no_base.component'], {
-        processors: {
-            html: content => content,
-            css:  content => content,
-            js:   content => content
-        },
-        dstBase: 'dst',
-        quiet: true
-    });
-
-    t.ok(grunt.file.exists(HTML));
-    t.ok(grunt.file.exists(JS));
-    t.ok(grunt.file.exists(CSS));
-
-    t.equal(fs.readFileSync(HTML).toString(), `<div>${EOL}  <b>kutya</b>${EOL}</div>`);
-    t.equal(fs.readFileSync(JS).toString(), 'console.log("cica");');
-    t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
-
-    grunt.file.delete('dst');
-});
-
 test('event firing test', async t => {
-    const HTML = path.join('dst', 'test.html');
+    const
+        COMPONENT = path.join(TEST_BASE, 'test.component'),
+        HTML = path.join(DST_BASE, 'test.html');
 
     t.plan(9);
 
-    await sfc.$transpile(['test.component'], {
+    await sfc.$transpile([COMPONENT], {
         processors: {
             html: content => content
             // nincs css processor
         },
         exts: {},
         onTranspileStart: (file, nodes) => {
-            t.equal(file, 'test.component');
+            t.equal(file, COMPONENT);
             t.equal(nodes.length, 1);
 
             const [template] = nodes;
@@ -158,17 +141,18 @@ test('event firing test', async t => {
             t.ok(!grunt.file.exists(HTML));
         },
         onTranspileEnd: [(file, nodes) => {
-            t.equal(file, 'test.component');
+            t.equal(file, COMPONENT);
             t.equal(nodes.length, 1);
 
             const [template] = nodes;
             t.equal(template.name, 'template');
             t.ok(grunt.file.exists(HTML));
         }],
+        dstBase: TEST_BASE,
         quiet: true
     });
 
-    grunt.file.delete('dst');
+    grunt.file.delete(DST_BASE);
 });
 
 test('processor querying test', t => {
@@ -182,14 +166,14 @@ test('processor querying test', t => {
     t.equal(Object.keys(mapped).length, 2);
     t.equal(mapped.js, jsProcessor);
 
-    const factory = require('./html-processor');
+    const factory = require('../test/html-processor');
 
     t.equal(factory.__callCount, 1);
     t.ok(!!factory.__options);
     t.equal(factory.__options.foo, 'bar');
     t.ok(typeof mapped.html === 'function');
 
-    function jsProcessor(){}
+    function jsProcessor() {}
 });
 
 test('hook setting test', async t => {
@@ -197,12 +181,12 @@ test('hook setting test', async t => {
 
     const onTranspileStart = [];
 
-    await sfc.$transpile(['test.component'], {
+    await sfc.$transpile([path.join(TEST_BASE, 'test.component')], {
         processors: {
             '<%= dirs.test %>/html-processor': {},
-            css:  content => {}
+            css:  () => {}
         },
-        dstBase: 'dst',
+        dstBase: TEST_BASE,
         onTranspileStart,
         quiet: true
     });

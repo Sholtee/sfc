@@ -15,7 +15,8 @@
     "eslint": "^5.15.1",
     "tape": "^4.9.1",
     "tape-promise": "^4.0.0",
-    "run-script-os": "^1.0.5"
+    "run-script-os": "^1.0.5",
+    "run-for-every-file": "^1.1.0"
   },
   "engines": {
     "node": ">=0.8.0"
@@ -34,6 +35,6 @@
     "lint:win32": "eslint --config eslint.json --rule linebreak-style:[warn,windows] tasks/*.js  lib/*.js",
     "lint:linux": "eslint --config eslint.json --rule linebreak-style:[warn,unix] tasks/*.js  lib/*.js",
     "pretest": "npm run lint",
-    "test": "cd test && node test.js"
+    "test": "run-for-every-file --src ./ --file \"**/*.test.js\" --run \"node {{src-file}}\""
   }
 }
