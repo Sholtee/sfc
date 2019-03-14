@@ -13,7 +13,8 @@
   "devDependencies": {
     "grunt": "^1.0.2",
     "eslint": "^5.15.1",
-    "tape": "^4.9.1"
+    "tape": "^4.9.1",
+    "run-script-os": "^1.0.5"
   },
   "engines": {
     "node": ">=0.8.0"
@@ -28,8 +29,9 @@
     "url": "git+https://github.com/Sholtee/sfc.git"
   },
   "scripts": {
-    "pretest_win": "eslint --config eslint.json --rule linebreak-style:[warn,windows] tasks/*.js",
-    "pretest_unix": "eslint --config eslint.json --rule linebreak-style:[warn,unix] tasks/*.js",
+    "pretest": "run-script-os",
+    "test:win32": "eslint --config eslint.json --rule linebreak-style:[warn,windows] tasks/*.js",
+    "test:linux": "eslint --config eslint.json --rule linebreak-style:[warn,unix] tasks/*.js",
     "test": "cd test && node test.js"
   }
 }
