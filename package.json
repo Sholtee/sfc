@@ -12,6 +12,7 @@
   "dependencies": {},
   "devDependencies": {
     "grunt": "^1.0.2",
+    "eslint": "^5.15.1",
     "tape": "^4.9.1"
   },
   "engines": {
@@ -27,6 +28,7 @@
     "url": "git+https://github.com/Sholtee/sfc.git"
   },
   "scripts": {
+    "pretest": "eslint -c eslint.json tasks/*.js",
     "test": "cd test && node test.js"
   }
 }
