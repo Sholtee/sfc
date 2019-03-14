@@ -58,8 +58,8 @@ Requires or defines processors.
 Basically processors are functions to do the transformation of the node content. During transpiling the content of each component node will be passed to the corresponding processor (identified by the `processor` attribute). 
 
 Processors have only one parameter:
-- content: The content of the current node to be transpiled
-- retVal: The transpiled content to be written out
+- content [`string`]: The content of the current node to be transpiled
+- retVal [`string | Promise`]: The transpiled content to be written out
 
 They may have the following properties:
 - `id`: The unique id of the processor (e.g. "pug")
@@ -529,3 +529,6 @@ module.exports = function jsProcessorFactory({scope = {}}) {
   2. Treat empty `dst` as a valid path
 - 0.0.17: Processors can be queried
 - 0.0.18: Small refactor
+- 0.0.19:
+  1. `processor` attribute is not mandatory anymore
+  2. Async processor support
