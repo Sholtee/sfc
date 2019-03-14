@@ -232,10 +232,10 @@ grunt.initConfig({
 <!-- 
   Notes:
     0) Node names must be unique (per component)
-    1) At least the "processor" attribute must be set on each node 
-    2) Without "dstBase" "dst" should be "<%= project.dirs.dist %>/views/"
+    1) If "processor" is omitted the raw node content will be used
+    2) If "dst" is omitted the output of the processor will be treated as void
     3) The output file will be named "dummy.html" (because "dst" is a folder)
-    4) If "dst" is omitted the output of the processor will be treated as void
+    4) Without "dstBase" "dst" should be "<%= project.dirs.dist %>/views/"
 -->
 <template processor="pug" dst="views/">
 .foo
