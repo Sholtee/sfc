@@ -32,6 +32,8 @@
     "lint": "run-script-os",
     "lint:win32": "eslint --config eslint.json --rule linebreak-style:[warn,windows] tasks/*.js",
     "lint:linux": "eslint --config eslint.json --rule linebreak-style:[warn,unix] tasks/*.js",
+
+    "pretest": "npm run lint",
     "test": "cd test && node test.js"
   }
 }
