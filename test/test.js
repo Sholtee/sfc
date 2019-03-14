@@ -161,6 +161,30 @@ test('transpiling test (no processor)', async t => {
     grunt.file.delete('dst');
 });
 
+test('transpiling test (async processor)', async t => {
+    const
+        HTML = path.join('dst', 'test.html'),
+        CSS  = path.join('dst', 'my.css');
+
+    t.plan(4);
+
+    await sfc.$transpile(['test.component'], {
+        processors: {
+            html: content => new Promise(resolve => setTimeout(resolve('<!-- cica -->' + content), 10)), // async
+            css:  content => content
+        },
+        quiet: true
+    });
+
+    t.ok(grunt.file.exists(HTML));
+    t.ok(grunt.file.exists(CSS));
+
+    t.equal(fs.readFileSync(HTML).toString(), `<!-- cica --><div>${EOL}  <b>kutya</b>${EOL}</div>`);
+    t.equal(fs.readFileSync(CSS).toString(), 'div{display: none;}');
+
+    grunt.file.delete('dst');
+});
+
 test('processor context test', async t => {
     t.plan(3);
 
