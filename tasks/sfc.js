@@ -2,9 +2,8 @@
 *  sfc.js                                                                       *
 *  Author: Denes Solti                                                          *
 ********************************************************************************/
-(function(module, require) {
 'use strict';
-
+(function(module, require) {
 const
     {registerMultiTask, template, file, log} = require('grunt'),
     {EOL} = require('os'),
@@ -14,6 +13,7 @@ const
 
 module.exports = Object.assign(function sfc() {
     registerMultiTask('sfc', 'Single File Component', function() {
+        // eslint-disable-next-line no-invalid-this
         sfc.$transpile(this.filesSrc, this.options());
     });
 }, {
@@ -56,7 +56,7 @@ $transpile: function(src, {exts = {}, processors = {}, dstBase, quiet, onTranspi
 
         onTranspileStart.forEach(hook => hook(fileSrc, nodes));
 
-        nodes = nodes.filter(function({processor, content, dst}) {
+        nodes = nodes.filter(function({name, processor, content, dst}) {
             //
             // 1) Ha nincs processzor akkor az eredeti tartalmat irjuk ki.
             // 2) A processzor akkor is keruljon meghivasra ha nincs "dst".
@@ -65,12 +65,12 @@ $transpile: function(src, {exts = {}, processors = {}, dstBase, quiet, onTranspi
             if (processor) content = processor.call(arguments[0], content);
 
             if (!content) {
-                if (!quiet) log.writeln(`"${node.name}" has no content to be written out`);
+                if (!quiet) log.writeln(`"${name}" has no content to be written out`);
                 return false;
             }
 
             if (!dst) {
-                if (!quiet) log.writeln(`"${node.name}" has no target file (dst)`);
+                if (!quiet) log.writeln(`"${name}" has no target file (dst)`);
                 return false;
             }
 
@@ -79,12 +79,12 @@ $transpile: function(src, {exts = {}, processors = {}, dstBase, quiet, onTranspi
         });
 
         onTranspileEnd.forEach(hook => hook(fileSrc, nodes));
-        
+
         if (!quiet) log.writeln(`${nodes.length} file(s) created`);
 
-        function parseDst({name, processor: {ext} = {}, attrs: {dst}}){
+        function parseDst({name, processor: {ext} = {}, attrs: {dst}}) {
             dst = template.process(dst);
-            
+
             //
             // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
             // nevet es az "exts" szerinti kiterjesztest kapja.
@@ -121,7 +121,7 @@ $mapProcessors: function(processors, onTranspileStartHooks, onTranspileEndHooks)
             //
             // TODO: ordered hooks
             //
-            
+
             if (onTranspileStart) onTranspileStartHooks.push(onTranspileStart);
             if (onTranspileEnd)   onTranspileEndHooks.push(onTranspileEnd);
         }
@@ -143,7 +143,7 @@ $parseAttributes: function(input) {
         rex = /([\w-]+)(?:=("|')((?:(?!\2|\r\n|\n|\r).)*)\2)/g,
         res = {};
 
-    for(var ar; (ar = rex.exec(input)) != null;){
+    for (var ar; (ar = rex.exec(input)) != null;) {
         const [, key, , value] = ar;
         res[key] = value;
     }
@@ -156,7 +156,7 @@ $parseNodes: function(input) {
         rex = /<([\w-]+)\b((?:[ \t]*[\w-]+(?:=("|')((?:(?!\3|\r\n|\n|\r).)*)\3))*)[\w \t-]*>([\s\S]*)<\/\1>$/gm,
         res = [];
 
-    for(var ar; (ar = rex.exec(input)) != null;) {
+    for (var ar; (ar = rex.exec(input)) != null;) {
         const
             [, name, rawAttrs, , , rawContent] = ar,
 
@@ -177,7 +177,7 @@ $parseNodes: function(input) {
             nodeEnd,
 
             attrs: this.$parseAttributes(rawAttrs),
-            
+
             // ugly =(
             contentStart: nodeStart + (rawContent.slice(1) !== content.slice(1) ? 1 : 0),
             contentEnd:   nodeStart + contentLines - (rawContent.slice(-1) !== content.slice(-1) ? 0 : 1)
