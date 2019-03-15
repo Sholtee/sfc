@@ -5,14 +5,14 @@
 'use strict';
 (function(module, require) {
 const
-    {registerMultiTask, template, file, log} = require('grunt'),
+    {registerMultiTask, file, log} = require('grunt'),
 
-    {forEachAsync, filterAsync, fileNameWithoutExtension, isFile, isDefined} = require('../lib/utils'),
+    {forEachAsync, filterAsync, isDefined} = require('../lib/utils'),
     {parseNodes} = require('../lib/parser'),
+    {mapDst, mapProcessors} = require('../lib/mapper'),
 
     {EOL} = require('os'),
-    fs    = require('fs'),
-    path  = require('path');
+    fs    = require('fs');
 
 module.exports = Object.assign(function sfc() {
     registerMultiTask('sfc', 'Single File Component', async function() {
@@ -36,7 +36,7 @@ $transpile: async function(src, {exts = {}, processors = {}, dstBase, quiet, onT
     if (!Array.isArray(onTranspileStart)) onTranspileStart = [onTranspileStart];
     if (!Array.isArray(onTranspileEnd))   onTranspileEnd   = [onTranspileEnd];
 
-    processors = this.$mapProcessors(processors, onTranspileStart, onTranspileEnd);
+    processors = mapProcessors(processors, onTranspileStart, onTranspileEnd);
 
     await forEachAsync(src, async fileSrc => {
         if (!quiet) log.write(`Processing file "${fileSrc}": `);
@@ -54,7 +54,7 @@ $transpile: async function(src, {exts = {}, processors = {}, dstBase, quiet, onT
             }
 
             if (isDefined(dst)) {
-                node.dst = parseDst(node);
+                node.dst = mapDst(fileSrc, dstBase, exts, node);
             }
 
             return node;
@@ -95,44 +95,7 @@ $transpile: async function(src, {exts = {}, processors = {}, dstBase, quiet, onT
         onTranspileEnd.forEach(hook => hook(fileSrc, nodes));
 
         if (!quiet) log.writeln(`${nodes.length} file(s) created`);
-
-        function parseDst({name, processor: {ext} = {}, attrs: {dst}}) {
-            dst = template.process(dst);
-
-            //
-            // Ha a node "dst" attributuma konyvtar akkor a kimeneti fajl a forrasfajl
-            // nevet es az "exts" szerinti kiterjesztest kapja.
-            //
-
-            if (!isFile(dst)) dst = path.format({
-                dir:  dst,
-                name: fileNameWithoutExtension(fileSrc),
-                ext:  ext || exts[name.toLowerCase()]
-            });
-
-            if (dstBase && !path.isAbsolute(dst)) dst = path.join(dstBase, dst);
-            return dst;
-        }
     });
-},
-
-$mapProcessors: function(processors, onTranspileStartHooks, onTranspileEndHooks) {
-    return Object.entries(processors).reduce((accu, [key, processor]) => {
-        if (typeof processor !== 'function') {
-            const {id, onTranspileStart, onTranspileEnd} = processor = require(template.process(key))(processor /*options*/);
-
-            key = id;
-
-            //
-            // TODO: ordered hooks
-            //
-
-            if (onTranspileStart) onTranspileStartHooks.push(onTranspileStart);
-            if (onTranspileEnd)   onTranspileEndHooks.push(onTranspileEnd);
-        }
-
-        return Object.assign(accu, {[key]: processor});
-    }, {});
 },
 
 $mergeExts: function(src, dst) {

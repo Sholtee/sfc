@@ -155,27 +155,6 @@ test('event firing test', async t => {
     grunt.file.delete(DST_BASE);
 });
 
-test('processor querying test', t => {
-    const mapped = sfc.$mapProcessors({
-        js: jsProcessor,
-        '<%= dirs.test %>/html-processor': {foo: 'bar'}
-    }, [], []);
-
-    t.plan(6);
-
-    t.equal(Object.keys(mapped).length, 2);
-    t.equal(mapped.js, jsProcessor);
-
-    const factory = require('../test/html-processor');
-
-    t.equal(factory.__callCount, 1);
-    t.ok(!!factory.__options);
-    t.equal(factory.__options.foo, 'bar');
-    t.ok(typeof mapped.html === 'function');
-
-    function jsProcessor() {}
-});
-
 test('hook setting test', async t => {
     t.plan(1);
 
