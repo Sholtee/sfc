@@ -7,7 +7,7 @@
 (function(require) {
 const
     {task: {_tasks: tasks}} = require('grunt'),
-    test  = require('tape-promise').default(require('tape')),
+    test  = require('tape'),
     sfc   = require('./sfc');
 
 test('task registration test', t => {
