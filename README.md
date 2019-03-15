@@ -533,3 +533,4 @@ module.exports = function jsProcessorFactory({scope = {}}) {
   1. `processor` attribute is *DEPRECATED* use `lang` instead
   2. `lang` and `processor` attributes are not mandatory anymore
   3. Async processor support
+- 0.0.20: Fixed error on task loading
