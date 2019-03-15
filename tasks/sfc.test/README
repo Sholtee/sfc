@@ -1,0 +1,1 @@
+We must separate test files to prevent GRUNT to try to load them.

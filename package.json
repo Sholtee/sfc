@@ -32,8 +32,8 @@
   },
   "scripts": {
     "lint": "run-script-os",
-    "lint:win32": "eslint --config eslint.json --rule linebreak-style:[warn,windows] tasks/*.js  lib/*.js",
-    "lint:linux": "eslint --config eslint.json --rule linebreak-style:[warn,unix] tasks/*.js  lib/*.js",
+    "lint:win32": "eslint --config eslint.json --rule linebreak-style:[warn,windows] tasks/**/*.js  lib/**/*.js",
+    "lint:linux": "eslint --config eslint.json --rule linebreak-style:[warn,unix] tasks/**/*.js  lib/**/*.js",
     "pretest": "npm run lint",
     "test": "run-for-every-file --src ./ --file \"**/*.test.js\" --run \"node {{src-file}}\""
   }

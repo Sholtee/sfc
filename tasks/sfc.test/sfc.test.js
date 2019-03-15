@@ -8,7 +8,7 @@
 const
     {task: {_tasks: tasks}} = require('grunt'),
     test  = require('tape'),
-    sfc   = require('./sfc');
+    sfc   = require('../sfc');
 
 test('task registration test', t => {
     t.plan(2);
