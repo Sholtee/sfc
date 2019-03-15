@@ -7,7 +7,7 @@
 const
     {registerMultiTask, file, log} = require('grunt'),
 
-    {forEachAsync, filterAsync, isDefined} = require('../lib/utils'),
+    {forEachAsync, filterAsync, isDefined, merge} = require('../lib/utils'),
     {parseNodes} = require('../lib/parser'),
     {mapDst, mapProcessors} = require('../lib/mapper'),
 
@@ -27,11 +27,11 @@ module.exports = Object.assign(function sfc() {
 }, {
 
 $transpile: async function(src, {exts = {}, processors = {}, dstBase, quiet, onTranspileStart = [], onTranspileEnd = []}) {
-    exts = this.$mergeExts(exts, {
+    exts = merge(exts, {
         template: '.html',
         script:   '.js',
         style:    '.css'
-    });
+    }, val => `.${val.replace(/^\.+/, '')}`);
 
     if (!Array.isArray(onTranspileStart)) onTranspileStart = [onTranspileStart];
     if (!Array.isArray(onTranspileEnd))   onTranspileEnd   = [onTranspileEnd];
@@ -96,14 +96,6 @@ $transpile: async function(src, {exts = {}, processors = {}, dstBase, quiet, onT
 
         if (!quiet) log.writeln(`${nodes.length} file(s) created`);
     });
-},
-
-$mergeExts: function(src, dst) {
-    return Object
-        .keys(src)
-        .reduce((dict, key) => Object.assign(dict, {
-            [key]: `.${src[key].replace(/^\.+/, '')}`
-        }), dst);
 }
 });
 })(module, require);
