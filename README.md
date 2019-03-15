@@ -55,7 +55,7 @@ Requires or defines processors.
 
 ##### About processors in general
 
-Basically processors are functions to do the transformation of the node content. During transpiling the content of each component node will be passed to the corresponding processor (identified by the `processor` attribute). 
+Basically processors are functions to do the transformation of the node content. During transpiling the content of each component node will be passed to the corresponding processor (identified by the `lang` or `processor` [deprecated] attribute). 
 
 Processors have only one parameter:
 - content [`string`]: The content of the current node to be transpiled
@@ -239,7 +239,7 @@ grunt.initConfig({
     3) The output file will be named "dummy.html" (because "dst" is a folder)
     4) Without "dstBase" "dst" should be "<%= project.dirs.dist %>/views/"
 -->
-<template processor="pug" dst="views/">
+<template lang="pug" dst="views/">
 .foo
   .bar XxX
 </template>
@@ -248,7 +248,7 @@ grunt.initConfig({
   Notes:
     0) The output file will be named "logic.js" (because "dst" is a file)
 -->
-<script processor="js" dst="scripts/logic.js">
+<script lang="js" dst="scripts/logic.js">
 console.log('kerekesfacapa');
 </script>
 .
@@ -363,12 +363,12 @@ For example in AngularJS the template can be included in the js file. To achieve
   Since the order is matter, we have to put the template on the first place so the compiled  
   HTML will be accessible to the following processors.
 -->
-<template processor="pug" dst="<%= project.dirs.tmp %>/views/">
+<template lang="pug" dst="<%= project.dirs.tmp %>/views/">
 .foo
   .bar XxX
 </template>
 
-<script processor="js" dst="<%= project.dirs.dist %>/scripts/">
+<script lang="js" dst="<%= project.dirs.dist %>/scripts/">
 console.log($$TEMPLATE$$);
 </script>
 .
@@ -530,5 +530,6 @@ module.exports = function jsProcessorFactory({scope = {}}) {
 - 0.0.17: Processors can be queried
 - 0.0.18: Small refactor
 - 0.0.19:
-  1. `processor` attribute is not mandatory anymore
-  2. Async processor support
+  1. `processor` attribute is *DEPRECATED* use `lang` instead
+  2. `lang` and `processor` attributes are not mandatory anymore
+  3. Async processor support

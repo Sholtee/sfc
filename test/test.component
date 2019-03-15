@@ -1,11 +1,11 @@
 <!-- Output file should be "dst/test.html" -->
-<template processor="html" dst="dst">
+<template lang="html" dst="dst">
 <div>
   <b>kutya</b>
 </div>
 </template>
 
 <!-- Suppress "dstBase" && default output file name! Output file should be "dst/my.css" -->
-<style processor="css" dst="<%= dirs.dst %>/my.css">
+<style lang="css" dst="<%= dirs.dst %>/my.css">
 div{display: none;}
 </style>
