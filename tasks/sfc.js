@@ -7,7 +7,7 @@
 const
     {registerMultiTask, template, file, log} = require('grunt'),
 
-    {forEachAsync, filterAsync} = require('../lib/utils'),
+    {forEachAsync, filterAsync, fileNameWithoutExtension, isFile} = require('../lib/utils'),
     {parseNodes} = require('../lib/parser'),
 
     {EOL} = require('os'),
@@ -114,15 +114,6 @@ $transpile: async function(src, {exts = {}, processors = {}, dstBase, quiet, onT
 
             if (dstBase && !path.isAbsolute(dst)) dst = path.join(dstBase, dst);
             return dst;
-
-            function fileNameWithoutExtension(file) {return path.basename(file, path.extname(file));}
-
-            //
-            // NE a grunt.file.isFile()-t hasznaljuk mert az nem letezo utvonalnal
-            // mindig hamissal ter vissza.
-            //
-
-            function isFile(file) {return !!path.parse(file).ext;}
         }
     });
 },
