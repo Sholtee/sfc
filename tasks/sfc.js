@@ -7,7 +7,7 @@
 const
     {registerMultiTask, template, file, log} = require('grunt'),
 
-    {forEachAsync, filterAsync, fileNameWithoutExtension, isFile} = require('../lib/utils'),
+    {forEachAsync, filterAsync, fileNameWithoutExtension, isFile, isDefined} = require('../lib/utils'),
     {parseNodes} = require('../lib/parser'),
 
     {EOL} = require('os'),
@@ -58,8 +58,6 @@ $transpile: async function(src, {exts = {}, processors = {}, dstBase, quiet, onT
             }
 
             return node;
-
-            function isDefined(val) {return typeof val !== 'undefined';}
         });
 
         onTranspileStart.forEach(hook => hook(fileSrc, nodes));
