@@ -42,7 +42,7 @@ Default:
 }
 ```
 
-Defines the file extension for the output files if `dst` is a directory. Note
+Defines the file extension for the output files if `dst` is a directory. Notes:
 - The object you passed will be merged with the defaults. 
 - Dot prefix can be omitted.
 
@@ -64,8 +64,8 @@ Processors have only one parameter:
 They may have the following properties:
 - `id`: The unique id of the processor (e.g. "pug")
 - `ext`: The extension of the output file (e.g. ".html"). Notes:
-  1) If presents it overrides the corresponding `exts` option.
-  2) Dot prefix can be omitted.
+  1. If presents it overrides the corresponding `exts` option.
+  2. Dot prefix can be omitted.
 - `onTranspileStart`: An optional hook to be executed before the transpiling process (see below)
 - `onTranspileEnd`: An optional hook to be executed after the transpiling process
 
@@ -536,3 +536,6 @@ module.exports = function jsProcessorFactory({scope = {}}) {
   2. `lang` and `processor` attributes are not mandatory anymore
   3. Async processor support
 - 0.0.20: Fixed error on task loading
+- 0.0.21:
+  1. Nodes can contain empty attributes (e.g. `scoped`)
+  2. `processor.ext` does not have to be dot prefixed
