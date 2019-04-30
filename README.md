@@ -59,13 +59,13 @@ Basically processors are functions to do the transformation of the node content.
 
 Processors have only one parameter:
 - content [`string`]: The content of the current node to be transpiled
-- retVal [`string | Promise`]: The transpiled content to be written out
+- retVal [`string | Promise<string>`]: The transpiled content to be written out
 
 They may have the following properties:
 - `id`: The unique id of the processor (e.g. "pug")
 - `ext`: The extension of the output file (e.g. ".html"). If presents it overrides the corresponding `exts` option.
 - `onTranspileStart`: An optional hook to be executed before the transpiling process (see below)
-- `onTranspileEnd`: An optional hook tobe executed after the transpiling process
+- `onTranspileEnd`: An optional hook to be executed after the transpiling process
 
 ##### Defining processors
 
