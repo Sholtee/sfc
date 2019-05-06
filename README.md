@@ -449,7 +449,7 @@ module.exports = function sassProcessorFactory({basedir}) {
                 outputStyle: 'compressed'
             }).css;
         } catch(e) {
-            throw new Error(e.formatted); // throw the proper message
+            throw e.formatted ? new Error(e.formatted) : e; // throw the proper message
         }
     }, {id: 'sass', ext: '.css'});
 };
