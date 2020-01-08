@@ -64,7 +64,7 @@ Processors have only one parameter:
 They may have the following properties:
 - `id`: The unique id of the processor (e.g. "pug")
 - `ext`: The extension of the output file (e.g. ".html"). Notes:
-  1. If presents it overrides the corresponding `exts` option.
+  1. If present it overrides the corresponding `exts` option.
   2. Dot prefix can be omitted.
 - `onTranspileStart`: An optional hook to be executed before the transpiling process (see below)
 - `onTranspileEnd`: An optional hook to be executed after the transpiling process
